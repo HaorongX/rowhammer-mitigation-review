@@ -1,0 +1,106 @@
+\documentclass[journal,twocolumn]{IEEEtran}
+\usepackage{cite}
+% *** GRAPHICS RELATED PACKAGES ***
+\usepackage[pdftex]{graphicx}
+\usepackage{authblk}
+%\graphicspath{{../pdf/}{../jpeg/}}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+
+% *** PDF, URL AND HYPERLINK PACKAGES ***
+\usepackage{url}
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+% \usepackage{draftwatermark}
+% \SetWatermarkText{DRAFT}
+% \SetWatermarkScale{1}
+
+\begin{document}
+\title{RowHammer Mitigations: A Review}
+\author{Haorong Xu}
+\affil{Guangzhou SCA School}
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+\section{Introduction}
+Proposed by Kim et al. in 2014\cite{Kim14}, RowHammer has raised significant attention in the academia and industry. The RowHammer attack targets modern DRAM with high cell density due to the scaling of DRAM process technology, which are inherently more prone to disturbance error, a fault caused by electromagnetic interference between adjacent DRAM cells. Kim et al. shows that, by frequently reading from the same address in DRAM, it is possible to induce bit-flips in nearby address, thereby corrupting data. 
+
+Since then, numerous works have demonstrated that attacks based on RowHammer pose severe risks to the confidentiality, integrity, and availability of data\cite{Zhang24}. Accordingly, copious mitigations have been proposed.
+
+In this work, we employ the taxonomy proposed by Loughlin et al. in 2021\cite{Loughlin21}, which contains three categories: frequency-centric; isolation-centric; refresh centric.
+
+\section{Background}
+
+\subsection{DRAM Organization \& RowHammer}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\columnwidth]{drambanks_colored.png}
+	\caption{High-level DRAM structure.}
+\end{figure}
+
+\figurename{1} illustrates the overall structure of a modern DRAM module, which consists of multiple DRAM chips, each featuring several DRAM banks that can be accessed independently. Within in each bank there are arrays of densely packed DRAM cells, made up of an access transistor and a capacitor. The bit is stored as electric charge in the capacitor, and the transistor, enabled by the word line, allows the charge in capacitor to be carried to the row buffer via bitline.
+
+To read from a DRAM row, the row has to be activated, which asserts the corresponding row line and loads the row to the row buffer. Subsequent read and write operations can be carried out on the row buffer. Due to the destructive nature of this operation, data has to be written back to the capacitor afterwards and the wordline must be set to low, known as closing the row. Additionally, capacitors inherently leak charge over time. Therefore, memory controller periodically refresh the memory, reading and rewriting all data in the DRAM.\@
+
+Unfortunately, the high density of DRAM cells makes them especially prone to electromagnetic interference. Kim et al.\cite{Kim14} discovered that by changing the voltage in a wordline repeatedly, an attacker can reliably induce bit-flips in nearby cells, later known as RowHammer. The number of activations required to induce a bit-flip is denoted as $N_{th}$, threshold of activation.
+
+\subsection{Previous Works}
+
+RowHammer has been heavily researched since its first debut, 
+
+\section{RowHammer Mitigations}
+
+Each category focuses on breaking one condition that enables the RowHammer attack: frequent activation of aggressor rows; spatial proximity of aggressor and victim rows; victim rows not being refreshed before flipping.
+
+\subsection{Frequency-Centric}
+
+Criticizing that Refresh-Centric mitigations introduce significant performance overhead at low $N_{th}$, Canpolat et al.\cite{Canpolat24} proposes BreakHammer to add another layer of prevention measure on top of existing Refresh-Centric mitigations, modifying the memory controller such that itlimits the memory bandwidth of threads that are observed to trigger excessive RowHammer-preventive actions. 
+
+\subsection{Isolation-Centric}
+
+Saxena et al.\cite{Saxena24} proposes a optimization technique to current refresh-centric mitigations, Rubix, that also aids prevention of RowHammer on its own. Noting that memory remapping is the cause of excessive hot-rows (\textit{i.e.} DRAM rows with activation count greater than $N_{th}$), and most refresh-centric approaches suffer from lower $N_{th}$ due to growing number of hot-rows, Rubix breaks the physical adjacency of spatially proximate lines by introducing randomized mapping, either by encrypting the line-address (Rubix-S) or dynamic randomization (Rubix-D).
+
+\subsection{Refresh-Centric}
+
+Kim et al.\cite{Kim23} proposes an Alert Refresh System (ARS), which employs the Misra-Gries algorithm to keep track of the count of ACTIVE commands on most accessed rows, thereby identifying potential aggressor rows. ARS then identify and refresh potential victim rows that are next to the aggressor rows. Notably, their system does not require change to the memory controller or DRAM interface in contrast to many other mitigations.
+
+Bostanci et al.\cite{Bostanci24} proposes CoMeT, a system that employs hash functions to track activation count and aggressor rows. CoMeT achieved effective prevention with relatively fewer preventive activations and lower number of counters and thus area overhead. Notably, it outperforms some then state-of-the-art mitigations at low $N_{th}$.
+
+Demirseren et al.\cite{Demirseren24} proposes a hybrid mitigation of Target Row Refreshing (TRR) and Probabilistic Adjacent Row Activation (PARA), using gradient ascent algorithm to dynamically adjust the refreshing probability, thereby reducing excessive activations.
+
+Jalee et al.\cite{Jaleel24} suggests that some previous refresh-centric solutions fail because they rely on counters to decide rows to keep track of and potential victims to be refreshed, allowing attacks to bypass mitigation of aggressor rows by filling the tracker array with dummy rows due to the limited size of tracker array. Proposing PrIDE instead, they employ a probabilistic insertion policy and FIFO eviction and mitigation policy, which eliminates the access-pattern dependency.
+
+Pointing to the limited space available for trackers, Qureshi et al.\cite{Qureshi24} also proposes a probabilistic mitigation approach, MINT, which randomly selects a row to mitigate for each REFRESH event.
+
+~\cite{Singh24} 
+
+\section{Evaluation}
+\section{Conclusion}
+% \appendix[Proof of the Zonklar Equations]
+\begin{thebibliography}{1}
+	\bibitem{Loughlin21}
+	K. Loughlin, S. Saroiu, A. Wolman, and B. Kasikci, “Stop! Hammer time: rethinking our approach to rowhammer mitigations,” in Proceedings of the Workshop on Hot Topics in Operating Systems, in HotOS ’21. New York, NY, USA: Association for Computing Machinery, Jun. 2021, pp. 88–95. doi: 10.1145/3458336.3465295.
+	\bibitem{Kim14}
+	Y. Kim et al., \textit{“Flipping bits in memory without accessing them: an experimental study of DRAM disturbance errors,”} SIGARCH Comput. Archit. News, vol. 42, no. 3, pp. 361–372, Oct. 2014, doi: 10.1145/2678373.2665726.
+	\bibitem{Zhang24}
+	Z. Zhang et al., \textit{“SoK: Rowhammer on Commodity Operating Systems,”} in Proceedings of the 19th ACM Asia Conference on Computer and Communications Security, in ASIA CCS ’24. New York, NY, USA: Association for Computing Machinery, Jul. 2024, pp. 436–452. doi: 10.1145/3634737.3656998.
+	\bibitem{Kim23}
+	N. Kim, K. Kim, and K.-S. Chung, \textit{“Alert Refresh System for Mitigating RowHammer,”} 2023 20th International SoC Design Conference (ISOCC), pp. 29–30, Oct. 2023, doi: 10.1109/ISOCC59558.2023.10396283.
+	\bibitem{Bostanci24}
+	F. N. Bostanci et al., \textit{“CoMeT: Count-Min-Sketch-based Row Tracking to Mitigate RowHammer at Low Cost,”} 2024 IEEE International Symposium on High-Performance Computer Architecture (HPCA), pp. 593–612, Mar. 2024, doi: 10.1109/HPCA57654.2024.00050.
+	\bibitem{Canpolat24}
+	O. Canpolat et al., \textit{“BreakHammer: Enhancing RowHammer Mitigations by Carefully Throttling Suspect Threads,”} 2024 57th IEEE/ACM International Symposium on Microarchitecture (MICRO), pp. 915–934, Nov. 2024, doi: 10.1109/MICRO61859.2024.00072.
+	\bibitem{Demirseren24}
+	N. U. Demirseren and I. Vakilinia, \textit{“Adaptive Row Activation and Refresh a Hybrid Approach to Mitigate RowHammer,”} 2024 IEEE 15th Annual Ubiquitous Computing, Electronics \&amp; Mobile Communication Conference (UEMCON), pp. 0471–0476, Oct. 2024, doi: 10.1109/UEMCON62879.2024.10754711.
+	\bibitem{Jaleel24}
+	A. Jaleel, G. Saileshwar, S. W. Keckler, and M. Qureshi, \textit{“PrIDE: Achieving Secure Rowhammer Mitigation with Low-Cost In-DRAM Trackers,”} in 2024 ACM/IEEE 51st Annual International Symposium on Computer Architecture (ISCA), Buenos Aires, Argentina: IEEE, Jun. 2024, pp. 1157–1172. doi: 10.1109/ISCA59077.2024.00087.
+	\bibitem{Qureshi24}
+	M. Qureshi, S. Qazi, and A. Jaleel, \textit{“MINT: Securely Mitigating Rowhammer with a Minimalist in-DRAM Tracker,”} 2024 57th IEEE/ACM International Symposium on Microarchitecture (MICRO), pp. 899–914, Nov. 2024, doi: 10.1109/MICRO61859.2024.00071.
+	\bibitem{Saxena24}
+	A. Saxena, S. Mathur, and M. Qureshi, \textit{“Rubix: Reducing the Overhead of Secure Rowhammer Mitigations via Randomized Line-to-Row Mapping,”} in Proceedings of the 29th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 2, in ASPLOS ’24, vol. 2. New York, NY, USA: Association for Computing Machinery, Apr. 2024, pp. 1014–1028. doi: 10.1145/3620665.3640404.
+	\bibitem{Singh24}
+	A. Singh and B. Panda, “Rowhammer Cache: A Last-Level Cache for Low-Overhead Rowhammer Tracking,” 2024 IEEE International Symposium on Hardware Oriented Security and Trust (HOST), pp. 349–360, May 2024, doi: 10.1109/HOST55342.2024.10545410.
+\end{thebibliography}
+\end{document}
