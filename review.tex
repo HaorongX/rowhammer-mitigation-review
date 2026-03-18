@@ -18,7 +18,6 @@
 \begin{document}
 \title{RowHammer Mitigations: A Review}
 \author{Haorong Xu}
-\affil{Guangzhou SCA School}
 \maketitle
 
 \begin{abstract}
@@ -29,22 +28,30 @@ Proposed by Kim et al. in 2014\cite{Kim14}, RowHammer has raised significant att
 
 Since then, numerous works have demonstrated that attacks based on RowHammer pose severe risks to the confidentiality, integrity, and availability of data\cite{Zhang24}. Accordingly, copious mitigations have been proposed.
 
-In this work, we employ the taxonomy proposed by Loughlin et al. in 2021\cite{Loughlin21}, which contains three categories: frequency-centric; isolation-centric; refresh centric.
+In this work, we employ the taxonomy proposed by Loughlin et al.\ in 2021\cite{Loughlin21}, which contains three categories: frequency-centric; isolation-centric; refresh centric.
 
 \section{Background}
 
-\subsection{DRAM Organization \& RowHammer}
+\subsection{DRAM Organization and RowHammer}
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\columnwidth]{drambanks_colored.png}
-	\caption{High-level DRAM structure.}
+	\caption{High-level DRAM structure}
 \end{figure}
 
 \figurename{1} illustrates the overall structure of a modern DRAM module, which consists of multiple DRAM chips, each featuring several DRAM banks that can be accessed independently. Within in each bank there are arrays of densely packed DRAM cells, made up of an access transistor and a capacitor. The bit is stored as electric charge in the capacitor, and the transistor, enabled by the word line, allows the charge in capacitor to be carried to the row buffer via bitline.
 
 To read from a DRAM row, the row has to be activated, which asserts the corresponding row line and loads the row to the row buffer. Subsequent read and write operations can be carried out on the row buffer. Due to the destructive nature of this operation, data has to be written back to the capacitor afterwards and the wordline must be set to low, known as closing the row. Additionally, capacitors inherently leak charge over time. Therefore, memory controller periodically refresh the memory, reading and rewriting all data in the DRAM.\@
 
-Unfortunately, the high density of DRAM cells makes them especially prone to electromagnetic interference. Kim et al.\cite{Kim14} discovered that by changing the voltage in a wordline repeatedly, an attacker can reliably induce bit-flips in nearby cells, later known as RowHammer. The number of activations required to induce a bit-flip is denoted as $N_{th}$, threshold of activation.
+Unfortunately, the high density of DRAM cells makes them especially prone to electromagnetic interference. Kim et al.\cite{Kim14} discovered that by changing the voltage in a wordline repeatedly, an attacker can reliably induce bit-flips in nearby rows, later known as RowHammer. The number of activations required to induce a bit-flip is denoted as $T_{RH}$ (RowHammer Threshold). And rows being accessed repeatedly by the attacker are referred to as aggressor rows, while rows with bits flipped are named victim rows, fittingly.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\columnwidth]{rowhammer_thres.png}
+	\caption{RowHammer Threshold $T_{RH}$ across different generations of DRAM (Data from \cite{Saxena24,Gloor25}). Overall, $T_{RH}$ continues to decrease, and the rebound in DDR5 is attributed to TRR mechanisms, a RowHammer mitigation, in DDR5 chips.\cite{Gloor25}}
+\end{figure}
+
+As the storage density of DRAM continues to grow, the $T_{RH}$ has been continuously decreasing over the last decade, as illustrated by \figurename{2}. 
 
 \subsection{Previous Works}
 
@@ -56,17 +63,17 @@ Each category focuses on breaking one condition that enables the RowHammer attac
 
 \subsection{Frequency-Centric}
 
-Criticizing that Refresh-Centric mitigations introduce significant performance overhead at low $N_{th}$, Canpolat et al.\cite{Canpolat24} proposes BreakHammer to add another layer of prevention measure on top of existing Refresh-Centric mitigations, modifying the memory controller such that itlimits the memory bandwidth of threads that are observed to trigger excessive RowHammer-preventive actions. 
+Criticizing that Refresh-Centric mitigations introduce significant performance overhead at low $T_{RH}$, Canpolat et al.\cite{Canpolat24} proposes BreakHammer to add another layer of prevention measure on top of existing Refresh-Centric mitigations, modifying the memory controller such that itlimits the memory bandwidth of threads that are observed to trigger excessive RowHammer-preventive actions. 
 
 \subsection{Isolation-Centric}
 
-Saxena et al.\cite{Saxena24} proposes a optimization technique to current refresh-centric mitigations, Rubix, that also aids prevention of RowHammer on its own. Noting that memory remapping is the cause of excessive hot-rows (\textit{i.e.} DRAM rows with activation count greater than $N_{th}$), and most refresh-centric approaches suffer from lower $N_{th}$ due to growing number of hot-rows, Rubix breaks the physical adjacency of spatially proximate lines by introducing randomized mapping, either by encrypting the line-address (Rubix-S) or dynamic randomization (Rubix-D).
+Saxena et al.\cite{Saxena24} proposes a optimization technique to current refresh-centric mitigations, Rubix, that also aids prevention of RowHammer on its own. Noting that memory remapping is the cause of excessive hot-rows (\textit{i.e.} DRAM rows with activation count greater than $T_{RH}$), and most refresh-centric approaches suffer from lower $T_{RH}$ due to growing number of hot-rows, Rubix breaks the physical adjacency of spatially proximate lines by introducing randomized mapping, either by encrypting the line-address (Rubix-S) or dynamic randomization (Rubix-D).
 
 \subsection{Refresh-Centric}
 
 Kim et al.\cite{Kim23} proposes an Alert Refresh System (ARS), which employs the Misra-Gries algorithm to keep track of the count of ACTIVE commands on most accessed rows, thereby identifying potential aggressor rows. ARS then identify and refresh potential victim rows that are next to the aggressor rows. Notably, their system does not require change to the memory controller or DRAM interface in contrast to many other mitigations.
 
-Bostanci et al.\cite{Bostanci24} proposes CoMeT, a system that employs hash functions to track activation count and aggressor rows. CoMeT achieved effective prevention with relatively fewer preventive activations and lower number of counters and thus area overhead. Notably, it outperforms some then state-of-the-art mitigations at low $N_{th}$.
+Bostanci et al.\cite{Bostanci24} proposes CoMeT, a system that employs hash functions to track activation count and aggressor rows. CoMeT achieved effective prevention with relatively fewer preventive activations and lower number of counters and thus area overhead. Notably, it outperforms some then state-of-the-art mitigations at low $T_{RH}$.
 
 Demirseren et al.\cite{Demirseren24} proposes a hybrid mitigation of Target Row Refreshing (TRR) and Probabilistic Adjacent Row Activation (PARA), using gradient ascent algorithm to dynamically adjust the refreshing probability, thereby reducing excessive activations.
 
@@ -102,5 +109,7 @@ Pointing to the limited space available for trackers, Qureshi et al.\cite{Quresh
 	A. Saxena, S. Mathur, and M. Qureshi, \textit{“Rubix: Reducing the Overhead of Secure Rowhammer Mitigations via Randomized Line-to-Row Mapping,”} in Proceedings of the 29th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 2, in ASPLOS ’24, vol. 2. New York, NY, USA: Association for Computing Machinery, Apr. 2024, pp. 1014–1028. doi: 10.1145/3620665.3640404.
 	\bibitem{Singh24}
 	A. Singh and B. Panda, “Rowhammer Cache: A Last-Level Cache for Low-Overhead Rowhammer Tracking,” 2024 IEEE International Symposium on Hardware Oriented Security and Trust (HOST), pp. 349–360, May 2024, doi: 10.1109/HOST55342.2024.10545410.
+	\bibitem{Gloor25}
+	S. Gloor, P. Jattke, and K. Razavi, “REFault: A Fault Injection Platform for Rowhammer Research on DDR5 Memory,” uASC, Mar. 2025, doi: 10.46586/uasc.2025.001.
 \end{thebibliography}
 \end{document}
