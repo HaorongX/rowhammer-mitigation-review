@@ -51,11 +51,11 @@ The high density of DRAM cells makes them especially prone to electromagnetic in
 	\caption{RowHammer Threshold $T_{RH}$ across different generations of DRAM (Data from \cite{Saxena24,Gloor25}). Overall, $T_{RH}$ continues to decrease, and the rebound in DDR5 is attributed to TRR mechanisms, a RowHammer mitigation, in DDR5 chips\cite{Gloor25}}\label{fig:threshold}
 \end{figure}
 
-To launch a RowHammer attack, the aggressor rows must be activated enough times before victim rows are refreshed (\textit{i.e.} within $t_{REFI}$) such that the accumulated disturbance induces bit-flips, since refreshing would offset the attacker's effort as capacitors are re-charged. Unfortunately, RowHammer vulnerability is worsening over time. As the storage density of DRAM continues to grow, the number of activations required to induce a bit-flip, denoted as $T_{RH}$ (RowHammer Threshold), has been continuously decreasing over the last decade, as illustrated by Fig.\ref{fig:threshold}. In today's most prevalent DRAM devices, $T_{RH}$ is as low as 10k to 20k. This trend poses severe risks to new DRAM devices because they become more vulnerable to RowHammer-like attack.
+To launch a RowHammer attack, the aggressor rows must be activated enough times before victim rows are refreshed (\textit{i.e.} within $t_{REFI}$) such that the accumulated disturbance induces bit-flips, since refreshing would offset the attacker's effort as capacitors are re-charged. Unfortunately, RowHammer vulnerability is worsening over time. As the storage density of DRAM continues to grow, the number of activations required to induce a bit-flip, denoted as $T_{RH}$ (RowHammer Threshold), has been continuously decreasing over the last decade, as illustrated by Fig.\ref{fig:threshold}. In today's most prevalent DRAM devices, $T_{RH}$ is as low as 10k to 20k. Certain factors, like access pattern, can further lower this number. This trend poses severe risks to new DRAM devices because they become more vulnerable to RowHammer-like attack.
 
 \subsection{Previous Works}
 
-RowHammer has been heavily researched since its first debut, and many mitigation strategies have been proposed accordingly. Many works have attempted to establish a uniform taxonomy for classifying RowHammer mitigations to provide insight for future research. A popular one is based on implementation level, dividing mitigations into either software-based or hardware-based. However, some recent works (e.g.\cite{Ojha25}) have employed a software hardware co-design approach, blurring the line between these two categories.
+RowHammer has been heavily researched since its first debut, and many mitigation strategies have been proposed accordingly. Many works have attempted to establish a uniform taxonomy for classifying RowHammer mitigations to provide insight for future research. A popular one is based on implementation level, dividing mitigations into either software-based or hardware-based. However, some recent works (e.g.\cite{Ojha25}) have employed a software-hardware co-design approach, blurring the line between these two categories.
 
 We instead adopt the taxonomy proposed by Loughlin et al.\cite{Loughlin21}: \textit{isolation-centric, frequency-centric,} and \textit{refresh-centric}. Each category corresponds to one condition for RowHammer, including spatial proximity of aggressor and victim rows, frequent activation of aggressor rows, and victim rows not being refreshed before flipping, respectively. This taxonomy sheds light on the tradeoffs and failure modes that are common to a type of mitigation approaches. 
 
@@ -83,7 +83,7 @@ Jalee et al.\cite{Jaleel24} suggests that some previous refresh-centric solution
 
 Pointing to the limited space available for trackers, Qureshi et al.\cite{Qureshi24} also proposes a probabilistic mitigation approach, MINT, which randomly selects a row to mitigate for each REFRESH event.
 
-~\cite{Singh24} 
+\cite{Singh24} 
 
 \section{Evaluation}
 \section{Conclusion}
