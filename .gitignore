@@ -7,3 +7,4 @@
 *.fdb_latexmk
 *.sty
 *.gz
+.~lock.tags.xlsx#
