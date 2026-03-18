@@ -41,23 +41,25 @@ In this work, we employ the taxonomy proposed by Loughlin et al.\ in 2021\cite{L
 
 Fig.\ref{fig:dramstruct} illustrates the overall structure of a modern DRAM module, which consists of multiple DRAM chips, each featuring several DRAM banks that can be accessed independently. Within each bank there are arrays of densely packed DRAM cells, made up of an access transistor and a capacitor. The bit is stored as electric charge in the capacitor, and the transistor, enabled by the word line, allows the charge in capacitor to be carried to the row buffer via bitline.
 
-To read from a DRAM row, the row has to be activated, which asserts the corresponding row line and loads the row to the row buffer. Subsequent read and write operations can be carried out on the row buffer. Due to the destructive nature of this operation, data has to be written back to the capacitor afterwards and the wordline must be set to low, known as closing the row. Additionally, capacitors inherently leak charge over time. Therefore, memory controller periodically refresh the memory, reading and rewriting all data in the DRAM.\@
+To read from a DRAM row, the row has to be activated, which asserts the corresponding row line and loads the row to the row buffer. Subsequent read and write operations can be carried out on the row buffer. Due to the destructive nature of this operation, data has to be written back to the capacitor afterwards and the wordline must be set to low, known as closing the row. Additionally, capacitors inherently leak charge over time. Therefore, memory controller periodically refreshes the memory, reading and rewriting all data in the DRAM. Specifically, memory controller issues a refresh instruction (REF) every $t_{REFI}$, and any row is guaranteed to be refreshed within $t_{REFW}$ (Refresh Window).
 
 The high density of DRAM cells makes them especially prone to electromagnetic interference. Kim et al.\cite{Kim14} discovered that by changing the voltage in a wordline repeatedly, an attacker can reliably induce bit-flips in nearby rows, later known as RowHammer.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\columnwidth]{rowhammer_thres.png}
-	\caption{RowHammer Threshold $T_{RH}$ across different generations of DRAM (Data from \cite{Saxena24,Gloor25}). Overall, $T_{RH}$ continues to decrease, and the rebound in DDR5 is attributed to TRR mechanisms, a RowHammer mitigation, in DDR5 chips\cite{Gloor25}}
+	\caption{RowHammer Threshold $T_{RH}$ across different generations of DRAM (Data from \cite{Saxena24,Gloor25}). Overall, $T_{RH}$ continues to decrease, and the rebound in DDR5 is attributed to TRR mechanisms, a RowHammer mitigation, in DDR5 chips\cite{Gloor25}}\label{fig:threshold}
 \end{figure}
 
-Unfortunately, RowHammer vulnerability is worsening over time. As the storage density of DRAM continues to grow, the number of activations required to induce a bit-flip, denoted as $T_{RH}$ (RowHammer Threshold), has been continuously decreasing over the last decade, as illustrated by \figurename{2}. In today's most prevalent DRAM devices, $T_{RH}$ is as low as 10k to 20k. This trend poses severe risks to new DRAM devices because they become more vulnerable to RowHammer-like attack.
+To launch a RowHammer attack, the aggressor rows must be activated enough times before victim rows are refreshed (\textit{i.e.} within $t_{REFI}$) such that the accumulated disturbance induces bit-flips, since refreshing would offset the attacker's effort as capacitors are re-charged. Unfortunately, RowHammer vulnerability is worsening over time. As the storage density of DRAM continues to grow, the number of activations required to induce a bit-flip, denoted as $T_{RH}$ (RowHammer Threshold), has been continuously decreasing over the last decade, as illustrated by Fig.\ref{fig:threshold}. In today's most prevalent DRAM devices, $T_{RH}$ is as low as 10k to 20k. This trend poses severe risks to new DRAM devices because they become more vulnerable to RowHammer-like attack.
 
 \subsection{Previous Works}
 
 RowHammer has been heavily researched since its first debut, and many mitigation strategies have been proposed accordingly. Many works have attempted to establish a uniform taxonomy for classifying RowHammer mitigations to provide insight for future research. A popular one is based on implementation level, dividing mitigations into either software-based or hardware-based. However, some recent works (e.g.\cite{Ojha25}) have employed a software hardware co-design approach, blurring the line between these two categories.
 
-Therefore, we instead adopt the taxonomy proposed by Loughlin et al.\cite{Loughlin21}: \textit{isolation-centric, frequency-centric,} and \textit{refresh-centric}. Each category corresponds to one condition for RowHammer, including spatial proximity of aggressor and victim rows, frequent activation of aggressor rows, and victim rows not being refreshed before flipping, respectively.
+We instead adopt the taxonomy proposed by Loughlin et al.\cite{Loughlin21}: \textit{isolation-centric, frequency-centric,} and \textit{refresh-centric}. Each category corresponds to one condition for RowHammer, including spatial proximity of aggressor and victim rows, frequent activation of aggressor rows, and victim rows not being refreshed before flipping, respectively. This taxonomy sheds light on the tradeoffs and failure modes that are common to a type of mitigation approaches. 
+
+In this work, we primarily focus on recent mitigation approaches against RowHammer on DRAM.\@
 
 \section{RowHammer Mitigations}
 
@@ -119,5 +121,7 @@ Pointing to the limited space available for trackers, Qureshi et al.\cite{Quresh
 	S. Gloor, P. Jattke, and K. Razavi, “REFault: A Fault Injection Platform for Rowhammer Research on DDR5 Memory,” uASC, Mar. 2025, doi: 10.46586/uasc.2025.001.
 	\bibitem{Ojha25}
 	S. S. Ojha, C. Moharir, and A. Choudhury, \textit{“Adaptive AI Techniques for Mitigating Rowhammer Attacks in Cloud Computing Environments,”} IJIREM, vol. 12, no. 2, pp. 16–21, Apr. 2025, doi: 10.55524/ijirem.2025.12.2.3.
+	\bibitem{DDR5}
+	\textit{“DDR5 SDRAM Datasheet: Directed Refresh Management (DRFM), Page-290,”} Micron Technology Inc., 2022. [Online]. Available: \url{https://static6.arrow.com/aropdfconversion/fc2b144ccf061160504edd742d01cb58fdda91bb/ddr5_sdram_core.pdf}
 \end{thebibliography}
 \end{document}
