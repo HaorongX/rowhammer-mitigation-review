@@ -1,0 +1,20 @@
+[
+  {"name": "background", "hex": "#F3F4F6"},
+  {"name": "dram_module_fill", "hex": "#CFE3C1"},
+  {"name": "dram_module_border", "hex": "#5F7F63"},
+  {"name": "rank_fill", "hex": "#B9D7E8"},
+  {"name": "rank_border", "hex": "#4A7A96"},
+  {"name": "component_fill", "hex": "#F4D06F"},
+  {"name": "component_border", "hex": "#C89B2B"},
+  {"name": "component_accent", "hex": "#E5B94E"},
+  {"name": "bank_container_fill", "hex": "#C6E6F2"},
+  {"name": "bank_container_border", "hex": "#4F8DA6"},
+  {"name": "grid_fill", "hex": "#F7F1E3"},
+  {"name": "grid_line", "hex": "#6B6B6B"},
+  {"name": "row_buffer_fill", "hex": "#EBC9C1"},
+  {"name": "row_buffer_border", "hex": "#A8766A"},
+  {"name": "arrow_primary", "hex": "#2F5D73"},
+  {"name": "arrow_dotted", "hex": "#3A6F86"},
+  {"name": "wordline", "hex": "#4A6FE3"},
+  {"name": "bitline", "hex": "#E76F51"}
+]
