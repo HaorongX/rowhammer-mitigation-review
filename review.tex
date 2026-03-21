@@ -4,6 +4,8 @@
 \usepackage[pdftex]{graphicx}
 \usepackage{authblk}
 \usepackage{booktabs}
+\usepackage{xcolor}
+\newcommand\todo[1]{\textit{\textcolor{red}{*TODO: #1}}}
 %\graphicspath{{../pdf/}{../jpeg/}}
 \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 
@@ -25,6 +27,7 @@
 \end{abstract}
 
 \begin{IEEEkeywords}
+	DRAM, RowHammer, Microarchitecture Security
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -32,7 +35,7 @@ Proposed by Kim et al.\ in 2014\cite{Kim14}, RowHammer has raised significant at
 
 Many works have demonstrated the far-reaching impact of RowHammer, ranging from gaining kernel privilege (e.g.\cite{Seaborn15}) to leaking confidential data (e.g.\cite{Rakin22,Mus23,Kwong20}). Accordingly, copious mitigations have been proposed.
 
-In this work, we employ the taxonomy proposed by Loughlin et al.\ in 2021\cite{Loughlin21}, which contains three categories: frequency-centric; isolation-centric; refresh centric.
+In this work, I employ the taxonomy proposed by Loughlin et al.\ in 2021\cite{Loughlin21}, which contains three categories: frequency-centric; isolation-centric; refresh centric.
 
 \section{Background}
 
@@ -57,13 +60,15 @@ The high density of DRAM cells makes them especially prone to electromagnetic in
 
 To launch a RowHammer attack, the aggressor rows must be activated enough times before victim rows are refreshed (\textit{i.e.} within $t_{REFI}$) such that the accumulated disturbance induces bit-flips, since refreshing would offset the attacker's effort as capacitors are re-charged. Unfortunately, RowHammer vulnerability is worsening over time. As the storage density of DRAM continues to grow, the number of activations required to induce a bit-flip, denoted as $T_{RH}$ (RowHammer Threshold), has been continuously decreasing over the last decade, as illustrated by Fig.\ref{fig:threshold}. In today's most prevalent DRAM devices, $T_{RH}$ is as low as 10k to 20k. Certain factors, like access pattern, can further lower this number. Aggressor rows also have increased \textit{blast radius}, affecting rows further away. This trend poses severe risks to new DRAM devices because they become more vulnerable to RowHammer-like attack.
 
+\todo{Add something about remapping}
+
 \subsection{Previous Works}
 
 RowHammer has been heavily researched since its first debut, and many mitigation strategies have been proposed accordingly. Many works have attempted to establish a uniform taxonomy for classifying RowHammer mitigations to provide insight for future research. A popular one is based on implementation level, dividing mitigations into either software-based or hardware-based. However, some recent works (e.g.\cite{Ojha25}) have employed a software-hardware co-design approach, blurring the line between these two categories.
 
-We instead adopt the taxonomy proposed by Loughlin et al.\cite{Loughlin21}: \textit{isolation-centric, frequency-centric,} and \textit{refresh-centric}. Each category corresponds to one condition for RowHammer, including spatial proximity of aggressor and victim rows, frequent activation of aggressor rows, and victim rows not being refreshed before flipping, respectively. This taxonomy sheds light on the tradeoffs and failure modes that are common to a type of mitigation approaches. 
+I instead adopt the taxonomy proposed by Loughlin et al.\cite{Loughlin21}: \textit{isolation-centric, frequency-centric,} and \textit{refresh-centric}. Each category corresponds to one condition for RowHammer, including spatial proximity of aggressor and victim rows, frequent activation of aggressor rows, and victim rows not being refreshed before flipping, respectively. This taxonomy sheds light on the tradeoffs and failure modes that are common to a type of mitigation approaches. 
 
-In this work, we comprehensively classify and evaluate major RowHammer mitigations. We build on the survey by Naseredini\cite{Naseredini23} which covers the mitigations up to 2023, and extend the analysis to works published from 2023 onward.
+In this work, I comprehensively classify and evaluate major RowHammer mitigations. I build on the survey by Naseredini\cite{Naseredini23} which covers the mitigations up to 2023, and put an emphasis on the analysis to works published from 2023 onward.
 
 \section{RowHammer Mitigations}
 
@@ -71,7 +76,7 @@ In this work, we comprehensively classify and evaluate major RowHammer mitigatio
 
 \begin{table*}
 	\centering
-	\caption{Something}\label{tab:refreshcomp}
+	\caption{Stateful Refresh-Centric Mitigations}\label{tab:refreshcomp}
 	\def\arraystretch{1.1}
 	\begin{tabular}{p{0.25\columnwidth}p{0.5\columnwidth}p{0.5\columnwidth}p{0.4\columnwidth}c}
 		\toprule
@@ -86,34 +91,46 @@ In this work, we comprehensively classify and evaluate major RowHammer mitigatio
 		PrIDE & Probabilistic sampling & FIFO & Oldest-entry first 
 		& \cite{Jaleel24}
 		\\
-		MINT & N/A & N/A & Random a priori selection of a future activation (every interval) & \cite{Qureshi24}
-		\\
+		CHaRM & Upon every activation & Evict old rows when a hash collision occurs & Upon eviction and when counter hits a threshold & \cite{Nazaraliyev25}
+		\\ 
 		\bottomrule
 	\end{tabular}
 \end{table*}
 
-Refresh-centric mitigation approaches aim to refresh potential victim rows, ones within the blast radius of aggressor rows, before they experience bit-flips. Therefore, most refresh-centric mitigations must be implemented on the hardware level, as software cannot directly refresh specific address of DRAM. Generally, this category of defenses uses either counters to keep track of potential aggressor rows or probabilistically refresh rows, each featuring some design tradeoffs.
+Refresh-centric mitigation approaches aim to refresh potential victim rows, ones within the blast radius of aggressor rows, before they experience bit-flips. Therefore, most refresh-centric mitigations must be implemented on the hardware level, as software cannot directly refresh specific address of DRAM. Overall, refreshing itself, if not carefully controlled, can also be exploited by attackers to induce bit-flips, acting as a bridge to transport the RowHammer effect\cite{Kogler22}.
 
-Counter-based mitigations record the activation count of \textit{hot-rows}, ones that receive significant more access, and perform mitigation. However, given the limited logic space (SRAM space) in DRAM modules, only very few counters can be added without significant area overhead. This challenges refresh-centric mitigations to make smart design choices, as using too few counters risks losing track of some aggressor rows, while it is possible for attackers to frequently activate dummy rows to fill up the tracker array\cite{Frigo20}, rendering the mitigation ineffective. Systems with more hot-rows also suffer from weighty performance penalty since potentially many rows need to be constantly refreshed. Jaleel et al.\cite{Jaleel24} criticize that counter-based approaches are dependent on the relative access frequency of different rows, which enables attackers to manipulate access count of dummy rows to bypass them.
+In this section, I contrast some refresh-centric mitigations based on their insertion policy, eviction policy, and mitigation policy (shown in Table \ref{tab:refreshcomp}) --- an abstraction proposed by Jaleel et al.\cite{Jaleel24} to analyze stateful DRAM trackers. These three policies specify how the algorithm determines which rows to add to the tracker array, which rows to remove from the tracker, and which rows to perform mitigation on, respectively. There are three corresponding failure modes, \textit{Tracker Insertion Failure (TIF)}, \textit{Tracker Retention Failure (TRF)}, and \textit{Tardiness}. Finally, I analyze stateless mitigations separately.
 
-Probabilistic mitigations, in comparison, often randomly select 
+\subsubsection{Insertion Policy}
 
-Overall, refreshing itself, if not carefully controlled, can be exploited by attackers to induce bit-flips, acting as a bridge to transport the RowHammer effect\cite{Kogler22}. Refresh-centric mitigations also suffer from decreased $T_{RH}$: in response, they either have to set lower threshold for activation count, or higher refresh probability, which both result in more refresh operations, taking up memory bandwidth and dragging the memory system.
+Insertion policy decides which rows should be monitored by the counter array. In the case an insertion policy fails to insert an aggressor row into the tracker array before it reaches $T_{RH}$ activations, a \textit{Tracker Insertion Failure (TIF)} occurs. Systems with more hot-rows also suffer from weighty performance penalty since potentially many rows need to be constantly refreshed. 
 
-In this section, we contrast 
+In response, some mitigations \cite{Kim23,Bostanci24} employ a counter-based approach to keep track of the activation count of potential aggressor rows, \textit{hot-rows}, ones that receive significant more access. Given the limited logic space (SRAM space) in DRAM modules, only very few counters can be added without significant area overhead. Their insertion policy, therefore, must be designed to leverage the limited number of counters to track all potential aggressors. For instance, \cite{Kim23} uses Misra-Gries, a streaming algorithm for solving the frequent elements problem, to watch the most accessed rows. \cite{Bostanci24, Nazaraliyev25} use hashing algorithm to map a counter to a group of rows to reduce the total number of counters.
 
-\cite{Kim23,Bostanci24} implement algorithm to only track activation count of rows most likely to be aggressors. 
+While these mitigations severely suffer from lower $T_{RH}$, issuing more refresh operations, taking up memory bandwidth and dragging the system if not handled properly, Jaleel et al.\cite{Jaleel24} criticize that counter-based approaches are dependent on the relative access frequency of different rows. As it is  possible for attackers to frequently activate dummy rows to fill up the tracker array\cite{Frigo20}, rendering the mitigation ineffective, the access-pattern dependency enables attackers to manipulate access count of dummy rows to bypass them.
 
-Kim et al.\cite{Kim23} proposes an Alert Refresh System (ARS), which employs the Misra-Gries algorithm to keep track of the count of ACTIVE commands on most accessed rows, thereby identifying potential aggressor rows. ARS then identify and refresh potential victim rows that are next to the aggressor rows. Notably, their system does not require change to the memory controller or DRAM interface in contrast to many other mitigations.
+Probabilistic insertion policy, in comparison, randomly choose rows to add to the tracker, which eliminates access-pattern dependency. PrIDE\cite{Jaleel24} is an instance of such mitigation, which can withstand lower $T_{RH}$ as the tracker array size increases. It's worth noting that probabilistic insertion policy is not deterministic, so there is a chance that the activations on aggressor rows are omitted without mitigation.
 
-Bostanci et al.\cite{Bostanci24} proposes CoMeT, a system that employs hash functions to track activation count and aggressor rows. CoMeT achieved effective prevention with relatively fewer preventive activations and lower number of counters and thus area overhead. Notably, it outperforms some then state-of-the-art mitigations at low $T_{RH}$.
+Interestingly, \cite{Demirseren24} is a juxtaposition of both approaches, dynamically adjusting refresh probability based on counter values. While this combination indeed reduces excessive refreshes, it also forgoes the advantage of strict access-pattern independence.
 
-Demirseren et al.\cite{Demirseren24} proposes a hybrid mitigation of Target Row Refreshing (TRR) and Probabilistic Adjacent Row Activation (PARA), using gradient ascent algorithm to dynamically adjust the refreshing probability, thereby reducing excessive activations.
+\todo{Do I frame it this way? Sounds like I just blindly agreed with access-pattern dependency stuff. Also single-sided, double-sided, and many-sided RowHammer}
 
-Jalee et al.\cite{Jaleel24} suggests that some previous refresh-centric solutions fail because they rely on counters to decide rows to keep track of and potential victims to be refreshed, allowing attacks to bypass mitigation of aggressor rows by filling the tracker array with dummy rows due to the limited size of tracker array. Proposing PrIDE instead, they employ a probabilistic insertion policy and FIFO eviction and mitigation policy, which eliminates the access-pattern dependency.
+\subsubsection{Eviction Policy}
 
-Pointing to the limited space available for trackers, Qureshi et al.\cite{Qureshi24} also proposes a probabilistic mitigation approach, MINT, which randomly selects a row to mitigate for each REFRESH event.
+Specifying which rows to remove from the tracker array, eviction policy can fail when a \textit{Tracker Retention Failure (TRF)} arises, in which the tracker evicts a aggressor row without mitigating it.
 
+For example, as in the case of\cite{Kim23}, where rows with lower activation count are evicted, the eviction policy is stemmed from the relative access frequency of different rows. This again allows for bypass by manipulating the ratio of activation count of dummy rows to that of real aggressor rows.
+
+Mitigations have taken different ways to prevent TRF. \cite{Bostanci24, Jaleel24} make their eviction policy access-pattern independent, seeking a non-deterministic approach that is not easily defeated by carefully crafted attack pattern. \cite{Nazaraliyev25} retains the activation count of rows being evicted, so they will be mitigated upon later activation despite being evicted.
+
+Tardiness is also an issue that can potentially arise from eviction policy in conjunction with mitigation policy, in which the aggressor rows receive enough activations over $T_{RH}$ while they are waiting to be mitigated in the tracker array. We continue this discussion further in the next section.
+
+\subsubsection{Mitigation Policy}
+\subsubsection{Stateless Mitigations}
+
+Stateless mitigations often embrace a probabilistic approach that does not require tracking the activation frequency of any rows, and thus do not fit into Jaleel's framework of insertion, eviction, and mitigation policy. Instead, they randomly choose rows to mitigate.
+
+The earliest example of probability-based mitigation is PARA\cite{Kim14}, which has a small chance to refresh nearby rows for every row activation. The idea is that, as aggressor rows must be frequently activated, there is a high probability they will be mitigated at some point before $t_{REFI}$, likely with fewer excess refresh than counter-based mitigations and therefore lower performance overhead. Qureshi et al. Similarly, \cite{Qureshi24,Woo24} also probabilistically mitigate randomly selected rows.
 
 \subsection{Frequency-Centric}
 
@@ -164,6 +181,13 @@ Saxena et al.\cite{Saxena24} proposes a optimization technique to current refres
 	\bibitem{Kogler22}
 	A. Kogler et al., \textit{“Half-Double: Hammering From the Next Row Over,”} presented at the 31st USENIX Security Symposium (USENIX Security 22), 2022, pp. 3807–3824. Accessed: Mar. 19, 2026. [Online]. Available: https://www.usenix.org/conference/usenixsecurity22/presentation/kogler-half-double
 	\bibitem{Frigo20}
-	P. Frigo et al., \textit{"TRRespass: Exploiting the Many Sides of Target Row Refresh,"} 2020 IEEE Symposium on Security and Privacy (SP), San Francisco, CA, USA, 2020, pp. 747-762, doi: 10.1109/SP40000.2020.00090. keywords: {DRAM chips;Security;Capacitors;Organizations;Hardware;Mobile handsets},
+	P. Frigo et al., \textit{"TRRespass: Exploiting the Many Sides of Target Row Refresh,"} 2020 IEEE Symposium on Security and Privacy (SP), San Francisco, CA, USA, 2020, pp. 747-762, doi: 10.1109/SP40000.2020.00090.
+	\bibitem{Woo24}
+	S. C. Woo et al., \textit{“RAMPART: RowHammer Mitigation and Repair for Server Memory Systems,”} in Proceedings of the International Symposium on Memory Systems, in MEMSYS ’23. New York, NY, USA: Association for Computing Machinery, Apr. 2024, pp. 1–15. doi: 10.1145/3631882.3631886.
+	\bibitem{Nazaraliyev25}
+	R. Nazaraliyev, S. Ganjisaffar, N. Nazaraliyev, and N. Abu-Ghazaleh, \textit{“PRACtical: Subarray-Level Counter Update and Bank-Level Recovery Isolation for Efficient PRAC Rowhammer Mitigation,”} Jul. 24, 2025, arXiv: arXiv:2507.18581. doi: 10.48550/arXiv.2507.18581.
 \end{thebibliography}
+
+\section{DRAFT REGION}
+
 \end{document}
