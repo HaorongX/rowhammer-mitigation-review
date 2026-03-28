@@ -8,3 +8,5 @@
 *.sty
 *.gz
 .~lock.tags.xlsx#
+*.bbl
+*.blg

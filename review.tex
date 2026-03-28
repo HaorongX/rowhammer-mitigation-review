@@ -22,7 +22,10 @@
 
 \begin{document}
 \title{RowHammer Mitigations: A Review}
-\author{Haorong Xu}
+\author{\IEEEauthorblockN{Haorong Xu}\\
+		\textit{Guangzhou SCA School}\\
+		Guangzhou, China \\
+		Xu.Haorong@scagz.com}
 \maketitle
 
 \begin{abstract}
@@ -33,11 +36,18 @@
 \end{IEEEkeywords}
 
 \section{Introduction}
+
+\highlight{THIS WILL BE REWRITTEN SHORTLY}
+
 Proposed by Kim et al.\ in 2014\cite{Kim14}, RowHammer has raised significant attention in the academia and industry. The RowHammer attack targets modern DRAM with high cell density due to the scaling of DRAM process technology, which are inherently more prone to disturbance error, a fault caused by electromagnetic interference between adjacent DRAM cells. Kim et al. shows that, by frequently reading from the same address in DRAM, it is possible to induce bit-flips in nearby address, thereby corrupting data. 
 
 Many works have demonstrated the far-reaching impact of RowHammer, ranging from gaining kernel privilege (e.g.\cite{Seaborn15}) to leaking confidential data (e.g.\cite{Rakin22,Mus23,Kwong20}). Accordingly, copious mitigations have been proposed.
 
-In this work, I employ the taxonomy proposed by Loughlin et al.\ in 2021\cite{Loughlin21}, which contains three categories: frequency-centric; isolation-centric; refresh centric.
+In this work, I employed the taxonomy proposed by Loughlin et al.\ in 2021\cite{Loughlin21}, which contains three categories: frequency-centric; isolation-centric; refresh centric.
+
+\highlight{Search Strategy:}
+
+Sources were identified through searches of Google Scholar, IEEE Xplore, and ACM Digital Library using the terms \textit{RowHammer}, \textit{DRAM Disturbance Error}, and \textit{Mitigation}. Articles published in 2023 and onward are considered. As for prior works, I refer to Naseredini's comprehensive review of RowHammer and its mitigations\cite{Naseredini23} as an index, which categorized works into many non-mutually exclusive groups. I include them to analyze common themes presented in a class of mitigations.
 
 \section{Background}
 
@@ -48,7 +58,7 @@ In this work, I employ the taxonomy proposed by Loughlin et al.\ in 2021\cite{Lo
 	\caption{High-level DRAM structure}\label{fig:dramstruct}
 \end{figure}
 
-Fig.\ref{fig:dramstruct} illustrates the overall structure of a modern DRAM module, which consists of multiple DRAM chips, each featuring several DRAM banks that can be accessed independently. Within each bank there are arrays of densely packed DRAM cells, made up of an access transistor and a capacitor. The bit is stored as electric charge in the capacitor, and the transistor, enabled by the word line, allows the charge in capacitor to be carried to the row buffer via bitline.
+Fig.\ref{fig:dramstruct} illustrates the overall structure of a modern DRAM module, which consists of multiple DRAM chips, each featuring several DRAM banks that can be accessed independently. Within each bank there are subarrays of densely packed DRAM cells, made up of an access transistor and a capacitor. The bit is stored as electric charge in the capacitor, and the transistor, enabled by the word line, allows the charge in capacitor to be carried to the row buffer via bitline.
 
 To read from a DRAM row, the system physical address first needs to be translated into physical DRAM address, which specifies banks, rows, columns, etc., and the translation is usually carried out by a programmable controller.\cite{DRAMMapping}. The manufacturer also uses this feature to internally remap rows to other locations to tolerate faults.
 Then, the row is activated, which asserts the corresponding row line and loads the row to the row buffer. Subsequent read and write operations can be carried out on the row buffer. Due to the destructive nature of this operation, data has to be written back to the capacitor afterwards and the wordline must be set to low, known as closing the row. Additionally, capacitors inherently leak charge over time. Therefore, memory controller periodically refreshes the memory, reading and rewriting all data in the DRAM. Specifically, memory controller issues a refresh instruction (REF) every $t_{REFI}$, and any row is guaranteed to be refreshed within $t_{REFW}$ (Refresh Window).
@@ -72,8 +82,6 @@ To launch a RowHammer attack, the aggressor rows must be activated enough times 
 \end{figure}
 
 Many variants of RowHammer revive the attack on platforms with mitigations deployed. While the naive RowHammer only hammers one row, inflicting bit-flips in nearby rows, double-sided attack hammers two rows across the victim rows at the same time, which induces bit-flip in even shorter time. Most recently, many-sided attack hammers many rows simultaneously to crash a widely deployed mitigation. This will be discussed more in-depth in section \ref{sec:insertion}.
-
-\todo{Methodology, in which Jaleel $\rightarrow$ justify, Loughlin. Explain Refresh-centric taking up most references because it is the most prevalent one}
 
 \subsection{Previous Works}
 
@@ -112,11 +120,17 @@ In this work, I comprehensively classify and evaluate major RowHammer mitigation
 		\\
 		ABACuS & Per-row counting (shared counters) & N/A & When the counter exceeds a threshold & \cite{Olgun24} 
 		\\
+		RIAC & Per-row counting & N/A & When the counter exceeds a threshold. Then randomize the counter & \cite{Bostanci25}
+		\\
+		TPRAC & Per-row counting & N/A & Periodically mitigate most accessed row & \cite{Woo25}
+		\\
+		MIRZA & Per-subarray counting & N/A & Perform MINT\cite{Qureshi24} mitigation on any subarray whose access count exceeds a threshold & \cite{Taneja26}
+		\\
 		\bottomrule
 	\end{tabular}
 \end{table*}
 
-Refresh-centric mitigation approaches aim to refresh potential victim rows, ones within the blast radius of aggressor rows, before they experience bit-flips. Therefore, most refresh-centric mitigations must be implemented on the hardware level, as software cannot directly refresh specific address of DRAM. Overall, refreshing itself, if not carefully controlled, can also be exploited by attackers to induce bit-flips, acting as a bridge to transport the RowHammer effect\cite{Kogler22}.
+Refresh-centric mitigation approaches aim to refresh potential victim rows, ones within the blast radius of aggressor rows, before they experience bit-flips. Therefore, most refresh-centric mitigations must be implemented on the hardware level, as software cannot directly refresh specific address of DRAM. Overall, refreshing itself, if not carefully controlled, can also be exploited by attackers to induce bit-flips, acting as a bridge to transport the RowHammer effect\cite{Kogler22}, or create a covert channel for leaking sensitive information\cite{Bostanci25}.
 
 In this section, I contrast some refresh-centric mitigations based on their insertion policy, eviction policy, and mitigation policy (shown in Table \ref{tab:refreshcomp}) --- an abstraction proposed by Jaleel et al.\cite{Jaleel24} to analyze stateful DRAM trackers. These three policies specify how the algorithm determines which rows to add to the tracker array, which rows to remove from the tracker, and which rows to perform mitigation on, respectively. There are three corresponding failure modes, \textit{Tracker Insertion Failure (TIF)}, \textit{Tracker Retention Failure (TRF)}, and \textit{Tardiness}. Finally, I analyze stateless mitigations separately.
 
@@ -124,19 +138,17 @@ In this section, I contrast some refresh-centric mitigations based on their inse
 
 Insertion policy decides which rows should be monitored by the counter array. In the case an insertion policy fails to insert an aggressor row into the tracker array before it reaches $T_{RH}$ activations, a \textit{Tracker Insertion Failure (TIF)} occurs. Systems with more hot-rows also suffer from weighty performance penalty since potentially many rows need to be constantly refreshed. 
 
-In response, many mitigations \cite{Kim23,Bostanci24,Lin25,Olgun24} employ a counter-based approach to keep track of the activation count of potential aggressor rows, \textit{hot-rows}, ones that receive significant more access, updated upon every activation operation. Given the limited logic space (SRAM space) in DRAM modules, only very few counters can be added without significant area overhead, while placing per-row counters in DRAM leads to significant slowdown\cite{Canpolat25}. The Per-Row Activation Counting (PRAC) deployed in DDR5 is an instance of such mitigation\cite{JESD79-5C}. Their insertion policy, therefore, must be designed to leverage the limited number of counters to track all potential aggressors. For instance, \cite{Kim23} uses Misra-Gries, a streaming algorithm for solving the frequent elements problem, to watch the most accessed rows. \cite{Bostanci24, Nazaraliyev25} use hashing algorithm to map a counter to a group of rows to reduce the total number of counters.
+In response, many mitigations (e.g.  \cite{Kim23,Bostanci24,Lin25,Olgun24,Woo25,Taneja26}) employ a counter-based approach to keep track of the activation count of potential aggressor rows, \textit{hot-rows}, ones that receive significant more access, updated upon every activation operation. Given the limited logic space (SRAM space) in DRAM modules, only very few counters can be added without significant area overhead, while placing per-row counters in DRAM leads to significant slowdown\cite{Canpolat25}. The Per-Row Activation Counting (PRAC) deployed in DDR5 is an instance of such mitigation\cite{JESD79-5C}. Their insertion policy, therefore, must be designed to leverage the limited number of counters to track all potential aggressors. For instance, \cite{Kim23} uses Misra-Gries, a streaming algorithm for solving the frequent elements problem, to watch the most accessed rows. \cite{Bostanci24, Nazaraliyev25} use hashing algorithm to map a counter to a group of rows to reduce the total number of counters, and \cite{Taneja26} only tracks activation count at subarray level.
 
-While these mitigations severely suffer from lower $T_{RH}$, issuing more refresh operations, taking up memory bandwidth and dragging the system if not handled properly, Jaleel et al.\cite{Jaleel24} criticize that counter-based approaches are dependent on the relative access frequency of different rows. As it is  possible for attackers to frequently activate dummy rows to fill up the tracker array\cite{Frigo20} in many-sided attack, rendering the mitigation ineffective, the access-pattern dependency enables attackers to manipulate access count of dummy rows to bypass them.
+While many of these mitigations severely suffer from lower $T_{RH}$, issuing more refresh operations, taking up memory bandwidth and dragging the system if not handled properly, Jaleel et al.\cite{Jaleel24} criticize that counter-based approaches are dependent on the relative access frequency of different rows. As it is  possible for attackers to frequently activate dummy rows to fill up the tracker array\cite{Frigo20} in many-sided attack, rendering the mitigation ineffective, the access-pattern dependency enables attackers to manipulate access count of dummy rows to bypass them.
 
 Probabilistic insertion policy, in comparison, randomly choose rows to add to the tracker, which eliminates access-pattern dependency. PrIDE\cite{Jaleel24} is an instance of such mitigation, which can withstand lower $T_{RH}$ as the tracker array size increases. It's worth noting that probabilistic insertion policy is not deterministic, so there is a chance that the activations on aggressor rows are omitted without mitigation.
 
 Interestingly, \cite{Demirseren24} is a juxtaposition of both approaches, dynamically adjusting refresh probability based on counter values. While this combination indeed reduces excessive refreshes, it also forgoes the advantage of strict access-pattern independence.
 
-\todo{eval}
-
 \subsubsection{Eviction Policy}
 
-Specifying which rows to remove from the tracker array, eviction policy can fail when a \textit{Tracker Retention Failure (TRF)} arises, in which the tracker evicts a aggressor row without mitigating it. Per-row counting methods (\cite{Olgun24,JESD79-5C,Demirseren24}), fortunately, does not suffer from TRF because they never evict rows.
+Specifying which rows to remove from the tracker array, eviction policy can fail when a \textit{Tracker Retention Failure (TRF)} arises, in which the tracker evicts a aggressor row without mitigating it. Per-row counting methods (\cite{Olgun24,JESD79-5C,Demirseren24,Woo25}), fortunately, does not suffer from TRF because they never evict rows.
 
 For example, as in the case of\cite{Kim23}, where rows with lower activation count are evicted, the eviction policy is stemmed from the relative access frequency of different rows. This again allows for bypass by manipulating the ratio of activation count of dummy rows to that of real aggressor rows.
 
@@ -150,23 +162,57 @@ Mitigation policy dictates which rows in the tracker array should be mitigated. 
 
 \cite{Demirseren24,Jaleel24} mitigate rows regardless of their current activation count, therefore having a relatively high tardiness. As such, their mitigation policy can considerably affect the minimum $T_{RH}$ they withstand, especially as the tracker array grows, as evidenced by Jaleel's experiment\cite{Jaleel24}.
 
-\cite{Kim23,Bostanci24,Nazaraliyev25,Lin25,Olgun24} decide to make an informed mitigation choice, prioritizing rows that have activation count over the threshold. However, whether they incur weighty slowdown when many rows hit $T_{RH}$ simultaneously or not remains unclear.
+\cite{Kim23,Bostanci24,Nazaraliyev25,Lin25,Olgun24,Woo25} decide to make an informed mitigation choice, prioritizing rows that have activation count over the threshold. However, whether they incur weighty slowdown when many rows hit $T_{RH}$ simultaneously or not remains unclear. Woo et al.\cite{Woo25} and Bostanci et al.\cite{Bostanci25} further demonstrates that access-pattern dependency in mitigation policy can potentially enable covert channels and leak sensitive data. Hence, the former sought to mitigate the most accessed row at fixed interval, while the latter proposed RIAC, implemented with PRAC, which sets the counter to a random number after performing mitigation so that the channel becomes heavily noised.
 
 \subsubsection{Stateless Mitigations}
 
-Stateless mitigations often embrace a probabilistic approach that does not require tracking the activation frequency of any rows, and thus do not fit into Jaleel's framework of insertion, eviction, and mitigation policy. Instead, they randomly choose rows to mitigate.
+Stateless mitigations often embrace a tracker-less approach that does not require counting number of activations of any rows, and thus do not fit into Jaleel's framework of insertion, eviction, and mitigation policy. For instance, some randomly choose rows to mitigate. Randomized stateless mitigations, in general, mostly have a low implementation overhead but also suffer from tardiness issue\cite{Qureshi24}.
 
 The earliest example of probability-based mitigation is PARA\cite{Kim14}, which has a small chance to refresh nearby rows for every row activation. The idea is that, as aggressor rows must be frequently activated, there is a high probability they will be mitigated at some point before $t_{REFI}$, likely with fewer excess refresh than counter-based mitigations and therefore lower performance overhead. Qureshi et al. Similarly, \cite{Qureshi24,Woo24} also probabilistically mitigate randomly selected rows.
 
-Stateless mitigations, in general, mostly have a low implementation overhead but also suffer from tardiness issue\cite{Qureshi24}.
+Some stateless mitigations are completely decoupled from access-pattern, such as FR-RFM\cite{Bostanci25}, which periodically issues mitigation refresh operation, which prevents timing channel.
 
 \subsection{Frequency-Centric}
+
+Alert Back-Off (ABO).
 
 Criticizing that Refresh-Centric mitigations introduce significant performance overhead at low $T_{RH}$, Canpolat et al.\cite{Canpolat24} proposes BreakHammer to add another layer of prevention measure on top of existing Refresh-Centric mitigations, modifying the memory controller such that it limits the memory bandwidth of threads that are observed to trigger excessive RowHammer-preventive actions. 
 
 \subsection{Isolation-Centric}
 
-Saxena et al.\cite{Saxena24} proposes a optimization technique to current refresh-centric mitigations, Rubix, that also aids prevention of RowHammer on its own. Noting that memory remapping is the cause of excessive hot-rows (\textit{i.e.} DRAM rows with activation count greater than $T_{RH}$), and most refresh-centric approaches suffer from lower $T_{RH}$ due to growing number of hot-rows, Rubix breaks the physical adjacency of spatially proximate lines by introducing randomized mapping, either by encrypting the line-address (Rubix-S) or dynamic randomization (Rubix-D).
+Unlike refresh-centric mitigations, isolation-centric mitigations do not \textit{reactively} mitigate rows, but instead break the spatial proximity between aggressor rows and their potential victim rows, eliminating chance of disturbance error. 
+
+Most of them are centered around two strategies: \textit{Remapping} and \textit{Partitioning} rows. Partitioning establishes physical boundaries to prevent rows with sensitive data from being affected by aggressor rows. Remapping, alternatively, intervenes in the translation from logical address to physical address, either statically or dynamically, to isolate faults or prevent disturbance from accumulating before a bit-flip is induced. The implementation level ranges from OS kernel to DRAM hardware, featuring distinct performance tradeoffs. In this section, we analyze these two approaches and their challenges.
+
+\subsubsection{Partitioning}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\columnwidth]{isolation_colored.png}
+	\caption{Isolation-centric mitigations based on partitioning. RowHammer cannot occur cross-subarray. Guard rows can be placed between aggressor rows and victim rows protect victims. There might be more than one guard rows in practice taking the blast radius into account.}\label{fig:isolation}
+\end{figure}
+
+Physical boundaries generally take two forms: \textit{guard rows}, and \textit{subarray isolation}, as illustrated by Fig. \ref{fig:isolation}. Guard rows are rows placed between potential aggressor and victim rows to "absorb" bit-flips. The earliest partitioning approach, though not being a direct mitigation to RowHammer itself, was a bank-aware memory allocator proposed by \cite{Yun14}, which enables memory pages to be allocated to specific banks. Then, \cite{Brasser16} was the first to use guard rows to defend against RowHammer by placing one guard row between kernel space and user space, and between user space processes memory. \cite{Izzo18} soon realized that one guard row was not sufficient to defeat increasingly sophisticated attack pattern, raising the number of guard rows to 8. Later, Konoth et al.\cite{Konoth18} proposed ZebRAM, placing one guard row between every two adjacent memory rows, thereby protecting the entire DRAM. While they claimed to use guard rows for integrity check and swap space, this essentially halved the memory space available for storing conventional data. Similarly, \cite{Tatar18,Bock19} also use guard rows to protect confidential data.
+
+This trend presents a main controversy with partitioning: \textit{capacity loss}, memory space that is rendered unusable for guarding purpose. Meanwhile, \cite{Loughlin21} criticizes that these mitigations forgo \textit{Bank-Level Parallelism (BLP)}, an important performance optimization in modern DRAM. Since memory operations on different DRAM banks can be carried out concurrently, putting memory pages from a trust domain, such as a process, in a single bank risks creating a hot-bank and serializing all subsequent memory access to this domain.
+
+Consequently, \cite{Loughlin21} stressed the importance of utilizing subarray isolation to restore BLP. That is, subarrays within the same bank are isolated from each other as they do not share bitlines, so hammering a row in a subarray will not affect an adjacent subarray (See Fig. \ref{fig:isolation}). Therefore, memory pages from a domain can still be placed in different banks while being isolated, as long as they are in not in the same subarray. Siloz\cite{Loughlin23} is a mitigation employing this strategy: it focuses on mitigating inter-VM RowHammer attacks by placing memory lines from different VMs in different subarrays, preventing RowHammer across trust domains (VMs). Unfortunately, it is criticized by \cite{Saxena24_2} for introducing \textit{stranding}, the second challenge of partitioning, which refers to DRAM space being underutilized, as space in a subarray cannot be used by other trust domains and might remain unused by the owner. \cite{Saxena24_2,M25} sought to further reduce stranding only strictly enforce isolation on confidential data.
+
+The evolution of partitioning mitigation approaches, in my observation, reflects two fundamental design tradeoff. The tradeoff between domain-aware protection and universal protection, and between capacity loss and stranding. \cite{Yun14,Brasser16,Izzo18,Tatar18,Bock19,Loughlin23,Saxena24_2,M25} have only used guard rows to protect confidential data and isolate memory space from different trust domains, as defined by the memory allocator on the OS level, which creates a semantic gap: the underlying hardware has no knowledge to decide which rows are to be protected. Conversely, universal protections like ZebRAM\cite{Konoth18} do not rely on the knowledge of trust domains, but they give up the flexibility to selectively protect rows, which leads us to the next tradeoff. Capacity loss stems from using guard rows as scapegoats, in turns losing the ability to utilize part of the memory space, whereas stranding is a result of using physical boundaries in DRAM, like banks and subarrays. Nonetheless, granting a certain domain exclusive access to a memory region prevents using the area not occupied by it currently. It also raises scalability issue because the number of trust domains in scaled system can quickly exceeds the number of subarrays.
+
+\subsubsection{Remapping}
+
+Remapping-based mitigations break spatial proximity by changing the neighbor rows of potential aggressor rows, so that the attacker cannot reliably identify and target a sensitive victim row. They are either static or dynamic, depending on whether the remapping is determined upon initialization or adjusted during runtime. The early example of dynamic remapping includes \textit{Randomized Row-Swap (RRS)}\cite{Saileshwar22}, in which aggressor rows are identified using counters and swapped with another randomly selected row. \cite{Saxena22,Saxena24,Wi26} also proposed mitigations alike. Dynamic remapping has a common prerequisite of identifying aggressor rows, which is usually implemented with a refresh-centric mitigation. Therefore, Rubix\cite{Saxena24} acts as an enhancement to refresh-centric mitigation approaches, aiming to reduce the number of hot-rows.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\columnwidth]{supercell_colored.png}
+	\caption{A controller row is aggregated from cells with the same address in all DRAMs in the rank.}\label{fig:supercell}
+\end{figure}
+
+Sadly, dynamically shuffling rows can be expensive: it requires storing mapping relationships in precious SRAM space and incurs performance overhead for swapping rows. Static defenses, pioneered by RAMPART\cite{Woo24}, sought to address this issue. Woo et al. made the key observation that when a controller row is hammered, the corresponding address in all DRAM chips are affected because a controller row is aggregated from cells with the same address in each DRAM chip in the same bank (As shown in Fig. \ref{fig:supercell}). Accordingly, shuffling rows in each DRAM leads to errors being spread out in different logical rows. Noting that if the bit-flips are scattered in different rows, it is possible to restore the corrupted data by using \textit{Error-Correction Code (ECC)} such as \textit{Single Device Data Correction (SDDC)}. The combination of static remapping and ECC confront the attacker to defeat both of them simultaneously to produce bit-flips.
+
+It becomes clear that remapping and partitioning mitigate RowHammer at the cost of spatial capacity and latency, respectively. The remapping-based mitigations are generally more transparent, eliminating the semantic gap between OS and hardware and providing universal protection that most partitioning mitigations forfeit for the sake of resource utilization, while partitioning offers a physical boundary that is easier to verify.
 
 \section{Discussion}
 \section{Conclusion}
@@ -224,5 +270,35 @@ Saxena et al.\cite{Saxena24} proposes a optimization technique to current refres
 	\textit{“JEDEC Updates JESD79-5C DDR5 SDRAM Standard: Elevating Performance and Security for Next-Gen Technologies | JEDEC.”} Accessed: Mar. 23, 2026. [Online]. Available: https://www.jedec.org/news/pressreleases/jedec-updates-jesd79-5c-ddr5-sdram-standard-elevating-performance-and-security
 	\bibitem{Olgun24}
 	A. Olgun et al., \textit{“ABACuS: all-bank activation counters for scalable and low overhead RowHammer mitigation,”} in Proceedings of the 33rd USENIX Conference on Security Symposium, in SEC ’24. USA: USENIX Association, Aug. 2024, pp. 1579–1596.
+	\bibitem{Bostanci25}
+	F. N. Bostancı et al., \textit{“Understanding and Mitigating Covert Channel and Side Channel Vulnerabilities Introduced by RowHammer Defenses,”} in Proceedings of the 58th IEEE/ACM International Symposium on Microarchitecture, in MICRO ’25. New York, NY, USA: Association for Computing Machinery, Oct. 2025, pp. 1412–1432. doi: 10.1145/3725843.3756029.
+	\bibitem{Woo25}
+	J. Woo, J. Qu, G. Saileshwar, and P. J. Nair, \textit{“When Mitigations Backfire: Timing Channel Attacks and Defense for PRAC-Based RowHammer Mitigations,”} in Proceedings of the 52nd Annual International Symposium on Computer Architecture, in ISCA ’25. New York, NY, USA: Association for Computing Machinery, Jun. 2025, pp. 739–756. doi: 10.1145/3695053.3731007.
+	\bibitem{Taneja26}
+	H. Taneja, A. Hajiabadi, M. Marazzi, K. Razavi, and M. Qureshi, \textit{“MIRZA: Efficiently mitigating RowHammer with randomization and ALERT,”} in Proceedings of the IEEE International Symposium on High Performance Computer Architecture (HPCA), 2026.
+	\bibitem{Loughlin23}
+	K. Loughlin, J. Rosenblum, S. Saroiu, A. Wolman, D. Skarlatos, and B. Kasikci, \textit{“Siloz: Leveraging DRAM Isolation Domains to Prevent Inter-VM Rowhammer,”} in Proceedings of the 29th Symposium on Operating Systems Principles, in SOSP ’23. New York, NY, USA: Association for Computing Machinery, Oct. 2023, pp. 417–433. doi: 10.1145/3600006.3613143.
+	\bibitem{Saxena24_2}
+	A. Saxena, W. Wang, and A. Daglis, \textit{“Preventing Rowhammer Exploits via Low-Cost Domain-Aware Memory Allocation,”} Sep. 23, 2024. Accessed: Mar. 26, 2026. [Online]. Available: https://arxiv.org/abs/2409.15463v1
+	\bibitem{Wi26}
+	Minbok Wi, \textit{“Investigating and Improving DRAM-Based Memory System Security by Analyzing and Exploiting DRAM Operations,”} Ph.D. dissertation, Seoul National University, 2025. Accessed: Mar. 04, 2026. [Online]. Available: \url{https://s-space.snu.ac.kr/handle/10371/228887}
+	\bibitem{M25}
+	P. M, M. Mutyam, and V. K. Tavva, \textit{“Selective Subarray Isolation for Mitigating RowHammer Attack,”} ACM Trans. Embed. Comput. Syst., vol. 24, no. 5s, p. 127:1-127:22, Sep. 2025, doi: 10.1145/3762996.
+	\bibitem{Izzo18}
+	N. Izzo, \textit{“Reliably achieving and efficiently preventing Rowhammer attacks,”} Master Thesis, POLITECNICO DI MILANO, 2017. Accessed: Mar. 26, 2026. [Online]. Available: \url{https://www.politesi.polimi.it/handle/10589/137667}
+	\bibitem{Brasser16}
+	F. Brasser, L. Davi, D. Gens, C. Liebchen, and A.-R. Sadeghi, \textit{“CAn’t Touch This: Practical and Generic Software-only Defenses Against Rowhammer Attacks,”} Dec. 07, 2016, arXiv: arXiv:1611.08396. doi: 10.48550/arXiv.1611.08396.
+	\bibitem{Konoth18}
+	R. K. Konoth et al., \textit{“ZebRAM: comprehensive and compatible software protection against rowhammer attacks,”} in Proceedings of the 13th USENIX conference on Operating Systems Design and Implementation, in OSDI’18. USA: USENIX Association, Oct. 2018, pp. 697–710.
+	\bibitem{Yun14}
+	H. Yun, R. Mancuso, Z.-P. Wu, and R. Pellizzoni, \textit{“PALLOC: DRAM bank-aware memory allocator for performance isolation on multicore platforms,”} in 2014 IEEE 19th Real-Time and Embedded Technology and Applications Symposium (RTAS), Berlin, Germany: IEEE, Apr. 2014, pp. 155–166. doi: 10.1109/RTAS.2014.6925999.
+	\bibitem{Tatar18}
+	A. Tatar, R. K. Konoth, E. Athanasopoulos, C. Giuffrida, H. Bos, and K. Razavi, \textit{“Throwhammer: Rowhammer Attacks over the Network and Defenses,”} presented at the 2018 USENIX Annual Technical Conference (USENIX ATC 18), 2018, pp. 213–226. Accessed: Mar. 27, 2026. [Online]. Available: \url{https://www.usenix.org/conference/atc18/presentation/tatar}
+	\bibitem{Bock19}
+	C. Bock, F. Brasser, D. Gens, C. Liebchen, and A.-R. Sadeghi, \textit{“RIP-RH: Preventing Rowhammer-based Inter-Process Attacks,”} in Proceedings of the 2019 ACM Asia Conference on Computer and Communications Security, in Asia CCS ’19. New York, NY, USA: Association for Computing Machinery, Jul. 2019, pp. 561–572. doi: 10.1145/3321705.3329827.
+	\bibitem{Saileshwar22}
+	G. Saileshwar, B. Wang, M. Qureshi, and P. J. Nair, \textit{“Randomized row-swap: mitigating Row Hammer by breaking spatial correlation between aggressor and victim rows,”} in Proceedings of the 27th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, in ASPLOS ’22. New York, NY, USA: Association for Computing Machinery, Feb. 2022, pp. 1056–1069. doi: 10.1145/3503222.3507716.
+	\bibitem{Saxena22}
+	A. Saxena, G. Saileshwar, P. J. Nair, and M. Qureshi, \textit{“AQUA: Scalable Rowhammer Mitigation by Quarantining Aggressor Rows at Runtime,”} in 2022 55th IEEE/ACM International Symposium on Microarchitecture (MICRO), Chicago, IL, USA: IEEE, Oct. 2022, pp. 108–123. doi: 10.1109/MICRO56248.2022.00022.
 \end{thebibliography}
 \end{document}
