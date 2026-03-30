@@ -1,0 +1,36 @@
+- Mitigations
+    - Refresh-centric
+        - Stateful
+            - Policies
+                - Insertion Policy
+                    - TIF
+                - Eviction Policy
+                    - TRF
+                - Mitigation Policy
+                    - Tardiness
+            - Access-pattern Dependency
+            - Deterministic Mitigation
+        - Stateless
+            - On-the-fly
+            - Periodic
+        - Timing side-channel
+    - Isolation-centric
+        - Partitioning
+            - Guard Rows
+            - Subarray Isolation
+            - Bank Isolation
+                - Forgone Bank-Level Parallelism
+            - Capacity Loss & Stranding
+                - Two-layer dynamic allocation $\rightarrow$ Trade space with delay
+                    - *Will this give rise to timing side-channel?
+        - Remapping
+            - Static
+                - Error confinement, must be paired with strong ECC
+            - Dynamic
+                - Delay
+        - Domain-aware VS Universal
+    - Frequency-centric
+- Common theme
+    - Decreasing $T_{RH}$
+    - Timing side-channel
+    - Increasingly sophisticated attack pattern

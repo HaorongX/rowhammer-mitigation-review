@@ -81,7 +81,7 @@ To launch a RowHammer attack, the aggressor rows must be activated enough times 
 	\caption{(a) Single-sided RowHammer: only one row is hammered, and the rows within its blast radius are affected. (b) Double-sided RowHammer: two aggressor rows sandwich a victim row in between. (c) Many-sided RowHammer: many rows hammered simultaneously.}\label{fig:sided}
 \end{figure}
 
-Many variants of RowHammer revive the attack on platforms with mitigations deployed. While the naive RowHammer only hammers one row, inflicting bit-flips in nearby rows, double-sided attack hammers two rows across the victim rows at the same time, which induces bit-flip in even shorter time. Most recently, many-sided attack hammers many rows simultaneously to crash a widely deployed mitigation. This will be discussed more in-depth in section \ref{sec:insertion}.
+Many variants of RowHammer revive the attack on platforms with mitigations deployed. While the naive RowHammer only hammers one row, double-sided attack hammers two rows across the victim rows at the same time, which induces bit-flip in even shorter time. Most recently, many-sided attack hammers many rows simultaneously to crash a widely deployed mitigation. This will be discussed more in-depth in section \ref{sec:insertion}.
 
 \subsection{Previous Works}
 
@@ -138,9 +138,9 @@ In this section, I contrast some refresh-centric mitigations based on their inse
 
 Insertion policy decides which rows should be monitored by the counter array. In the case an insertion policy fails to insert an aggressor row into the tracker array before it reaches $T_{RH}$ activations, a \textit{Tracker Insertion Failure (TIF)} occurs. Systems with more hot-rows also suffer from weighty performance penalty since potentially many rows need to be constantly refreshed. 
 
-In response, many mitigations (e.g.  \cite{Kim23,Bostanci24,Lin25,Olgun24,Woo25,Taneja26}) employ a counter-based approach to keep track of the activation count of potential aggressor rows, \textit{hot-rows}, ones that receive significant more access, updated upon every activation operation. Given the limited logic space (SRAM space) in DRAM modules, only very few counters can be added without significant area overhead, while placing per-row counters in DRAM leads to significant slowdown\cite{Canpolat25}. The Per-Row Activation Counting (PRAC) deployed in DDR5 is an instance of such mitigation\cite{JESD79-5C}. Their insertion policy, therefore, must be designed to leverage the limited number of counters to track all potential aggressors. For instance, \cite{Kim23} uses Misra-Gries, a streaming algorithm for solving the frequent elements problem, to watch the most accessed rows. \cite{Bostanci24, Nazaraliyev25} use hashing algorithm to map a counter to a group of rows to reduce the total number of counters, and \cite{Taneja26} only tracks activation count at subarray level.
+In response, many mitigations (e.g.  \cite{Kim23,Bostanci24,Lin25,Olgun24,Woo25,Taneja26}) employ a counter-based approach to keep track of the activation count of potential aggressor rows, \textit{hot-rows}, ones that receive significant more access, updated upon every activation operation. Given the limited logic space (SRAM space) in DRAM modules, only very few counters can be added without significant area overhead, while placing per-row counters in DRAM leads to significant slowdown\cite{Canpolat25}. The Per-Row Activation Counting (PRAC) deployed in DDR5 is an instance of such mitigation\cite{JESD79-5C}. Their insertion policy, therefore, must be designed to leverage the limited number of counters to track all potential aggressors. For instance, \cite{Kim23} uses Misra-Gries to watch the most accessed rows, and \cite{Bostanci24, Nazaraliyev25} use hashing algorithm to map a counter to a group of rows to reduce the total number of counters, and \cite{Taneja26} only tracks activation count at subarray level.
 
-While many of these mitigations severely suffer from lower $T_{RH}$, issuing more refresh operations, taking up memory bandwidth and dragging the system if not handled properly, Jaleel et al.\cite{Jaleel24} criticize that counter-based approaches are dependent on the relative access frequency of different rows. As it is  possible for attackers to frequently activate dummy rows to fill up the tracker array\cite{Frigo20} in many-sided attack, rendering the mitigation ineffective, the access-pattern dependency enables attackers to manipulate access count of dummy rows to bypass them.
+While many of these mitigations severely suffer from lower $T_{RH}$, issuing more refresh operations, taking up memory bandwidth and dragging the system if not handled properly, Jaleel et al.\cite{Jaleel24} criticize that counter-based approaches are dependent on the relative access frequency of different rows. As it is  possible for attackers to frequently activate dummy rows to fill up the tracker array in many-sided attack, rendering the mitigation ineffective, the access-pattern dependency enables attackers to manipulate access count of dummy rows to bypass them\cite{Frigo20}.
 
 Probabilistic insertion policy, in comparison, randomly choose rows to add to the tracker, which eliminates access-pattern dependency. PrIDE\cite{Jaleel24} is an instance of such mitigation, which can withstand lower $T_{RH}$ as the tracker array size increases. It's worth noting that probabilistic insertion policy is not deterministic, so there is a chance that the activations on aggressor rows are omitted without mitigation.
 
@@ -174,7 +174,9 @@ Some stateless mitigations are completely decoupled from access-pattern, such as
 
 \subsection{Frequency-Centric}
 
-Alert Back-Off (ABO).
+Frequency-centric mitigations detect and throttle excessive activations in potential aggressor rows.
+
+Alert Back-Off (ABO)\cite{DDR5} has become a built-in feature of DDR5 which automatically throttle 
 
 Criticizing that Refresh-Centric mitigations introduce significant performance overhead at low $T_{RH}$, Canpolat et al.\cite{Canpolat24} proposes BreakHammer to add another layer of prevention measure on top of existing Refresh-Centric mitigations, modifying the memory controller such that it limits the memory bandwidth of threads that are observed to trigger excessive RowHammer-preventive actions. 
 
