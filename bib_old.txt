@@ -1,0 +1,143 @@
+
+% \appendix[Proof of the Zonklar Equations]
+\begin{thebibliography}{1}
+	\bibitem{Kim14}
+	Y. Kim et al., “Flipping bits in memory without accessing them: an experimental study of DRAM disturbance errors,” SIGARCH Comput. Archit. News, vol. 42, no. 3, pp. 361–372, Oct. 2014, doi: 10.1145/2678373.2665726.
+	\bibitem{Loughlin21}
+	K. Loughlin, S. Saroiu, A. Wolman, and B. Kasikci, “Stop! Hammer time: rethinking our approach to rowhammer mitigations,” in \textit{Proceedings of the Workshop on Hot Topics in Operating Systems}, in HotOS ’21. New York, NY, USA: Association for Computing Machinery, Jun. 2021, pp. 88–95. doi: 10.1145/3458336.3465295.
+	\bibitem{Naseredini23}
+	A. Naseredini, “Exploring the Horizon: A Comprehensive Survey of Rowhammer,” Oct. 10, 2023, arXiv: arXiv:2310.06950. doi: 10.48550/arXiv.2310.06950.
+	\bibitem{Seaborn15}
+	M. Seaborn and T. Dullien, “Exploiting the DRAM Rowhammer Bug to Gain Kernel Privileges,” Black Hat, 2015.
+	\bibitem{DRAMMapping}
+	“DRAM Address Mapping • Versal Adaptive SoC Programmable Network on Chip and Integrated Memory Controller 1.1 LogiCORE IP Product Guide (PG313) • Reader • AMD Technical Information Portal.” Accessed: Mar. 23, 2026. [Online]. Available: \url{ https://docs.amd.com/r/en-US/pg313-network-on-chip/DRAM-Address-Mapping}
+	\bibitem{Walker21}
+	 A. J. Walker, S. Lee, and D. Beery, “On DRAM Rowhammer and the Physics of Insecurity,” IEEE Transactions on Electron Devices, vol. 68, no. 4, pp. 1400–1410, Apr. 2021, doi: 10.1109/TED.2021.3060362.
+	\bibitem{Rakin22}
+	A. S. Rakin, M. H. I. Chowdhuryy, F. Yao, and D. Fan, "DeepSteal: Advanced Model Extractions Leveraging Efficient Weight Stealing in Memories," in 2022 IEEE Symposium on Security and Privacy (SP), May 2022, pp. 1157–1174. doi: 10.1109/SP46214.2022.9833743.
+	\bibitem{Mus23}
+	K. Mus, Y. Doröz, M. C. Tol, K. Rahman, and B. Sunar, "Jolt: Recovering TLS Signing Keys via Rowhammer Faults," in 2023 IEEE Symposium on Security and Privacy (SP), May 2023, pp. 1719–1736. doi: 10.1109/SP46215.2023.10179450.
+	\bibitem{Kwong20}
+	A. Kwong, D. Genkin, D. Gruss, and Y. Yarom, "RAMBleed: Reading Bits in Memory Without Accessing Them," in 2020 IEEE Symposium on Security and Privacy (SP), San Francisco, CA, USA: IEEE, May 2020, pp. 695–711. doi: 10.1109/SP40000.2020.00020.
+	\bibitem{Kim23}
+	N. Kim, K. Kim, and K.-S. Chung, "Alert Refresh System for Mitigating RowHammer," 2023 20th International SoC Design Conference (ISOCC), pp. 29–30, Oct. 2023, doi: 10.1109/ISOCC59558.2023.10396283.
+	\bibitem{Bostanci24}
+	F. N. Bostanci et al., "CoMeT: Count-Min-Sketch-based Row Tracking to Mitigate RowHammer at Low Cost," 2024 IEEE International Symposium on High-Performance Computer Architecture (HPCA), pp. 593–612, Mar. 2024, doi: 10.1109/HPCA57654.2024.00050.
+	\bibitem{Canpolat24}
+	O. Canpolat et al., "BreakHammer: Enhancing RowHammer Mitigations by Carefully Throttling Suspect Threads," 2024 57th IEEE/ACM International Symposium on Microarchitecture (MICRO), pp. 915–934, Nov. 2024, doi: 10.1109/MICRO61859.2024.00072.
+	\bibitem{Demirseren24}
+	N. U. Demirseren and I. Vakilinia, "Adaptive Row Activation and Refresh a Hybrid Approach to Mitigate RowHammer," 2024 IEEE 15th Annual Ubiquitous Computing, Electronics \& Mobile Communication Conference (UEMCON), pp. 0471–0476, Oct. 2024, doi: 10.1109/UEMCON62879.2024.10754711.
+	\bibitem{Jaleel24}
+	A. Jaleel, G. Saileshwar, S. W. Keckler, and M. Qureshi, "PrIDE: Achieving Secure Rowhammer Mitigation with Low-Cost In-DRAM Trackers," in 2024 ACM/IEEE 51st Annual International Symposium on Computer Architecture (ISCA), Buenos Aires, Argentina: IEEE, Jun. 2024, pp. 1157–1172. doi: 10.1109/ISCA59077.2024.00087.
+	\bibitem{Qureshi24}
+	M. Qureshi, S. Qazi, and A. Jaleel, "MINT: Securely Mitigating Rowhammer with a Minimalist in-DRAM Tracker," 2024 57th IEEE/ACM International Symposium on Microarchitecture (MICRO), pp. 899–914, Nov. 2024, doi: 10.1109/MICRO61859.2024.00071.
+	\bibitem{Saxena24}
+	A. Saxena, S. Mathur, and M. Qureshi, "Rubix: Reducing the Overhead of Secure Rowhammer Mitigations via Randomized Line-to-Row Mapping," in Proceedings of the 29th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 2, in ASPLOS '24, vol. 2. New York, NY, USA: Association for Computing Machinery, Apr. 2024, pp. 1014–1028. doi: 10.1145/3620665.3640404.
+	\bibitem{Gloor25}
+	S. Gloor, P. Jattke, and K. Razavi, "REFault: A Fault Injection Platform for Rowhammer Research on DDR5 Memory," uASC, Mar. 2025, doi: 10.46586/uasc.2025.001.
+	\bibitem{Ojha25}
+	S. S. Ojha, C. Moharir, and A. Choudhury, "Adaptive AI Techniques for Mitigating Rowhammer Attacks in Cloud Computing Environments," IJIREM, vol. 12, no. 2, pp. 16–21, Apr. 2025, doi: 10.55524/ijirem.2025.12.2.3.
+	\bibitem{DDR5}
+	"DDR5 SDRAM Datasheet: Directed Refresh Management (DRFM), Page-290," Micron Technology Inc., 2022. [Online]. Available: \url{https://static6.arrow.com/aropdfconversion/fc2b144ccf061160504edd742d01cb58fdda91bb/ddr5_sdram_core.pdf}
+	\bibitem{Kogler22}
+	A. Kogler et al., "Half-Double: Hammering From the Next Row Over," presented at the 31st USENIX Security Symposium (USENIX Security 22), 2022, pp. 3807–3824. Accessed: Mar. 19, 2026. [Online]. Available: https://www.usenix.org/conference/usenixsecurity22/presentation/kogler-half-double
+	\bibitem{Frigo20}
+	P. Frigo et al., "TRRespass: Exploiting the Many Sides of Target Row Refresh," 2020 IEEE Symposium on Security and Privacy (SP), San Francisco, CA, USA, 2020, pp. 747-762, doi: 10.1109/SP40000.2020.00090.
+	\bibitem{Woo24}
+	S. C. Woo et al., “RAMPART: RowHammer Mitigation and Repair for Server Memory Systems," in Proceedings of the International Symposium on Memory Systems, in MEMSYS '23. New York, NY, USA: Association for Computing Machinery, Apr. 2024, pp. 1–15. doi: 10.1145/3631882.3631886.
+	\bibitem{Nazaraliyev25}
+	R. Nazaraliyev, S. Ganjisaffar, N. Nazaraliyev, and N. Abu-Ghazaleh, “PRACtical: Subarray-Level Counter Update and Bank-Level Recovery Isolation for Efficient PRAC Rowhammer Mitigation," Jul. 24, 2025, arXiv: arXiv:2507.18581. doi: 10.48550/arXiv.2507.18581.
+	\bibitem{Lin25}
+	C. S. Lin, J. Woo, P. J. Nair, and G. Saileshwar, “CnC-PRAC: Coalesce, not Cache, Per Row Activation Counts for an Efficient in-DRAM Rowhammer Mitigation," Jun. 13, 2025, arXiv: arXiv:2506.11970. doi: 10.48550/arXiv.2506.11970.
+	\bibitem{Hajiabadi25}
+	A. Hajiabadi, M. Marazzi, and K. Razavi, “CHaRM: Checkpointed and Hashed Counters for Flexible and Efficient Rowhammer Mitigation,” in Proceedings of the 2025 ACM SIGSAC Conference on Computer and Communications Security, in CCS ’25. New York, NY, USA: Association for Computing Machinery, Nov. 2025, pp. 2534–2548. doi: 10.1145/3719027.3765021.
+	\bibitem{JESD79-5C}
+	“JEDEC Updates JESD79-5C DDR5 SDRAM Standard: Elevating Performance and Security for Next-Gen Technologies | JEDEC." Accessed: Mar. 23, 2026. [Online]. Available: https://www.jedec.org/news/pressreleases/jedec-updates-jesd79-5c-ddr5-sdram-standard-elevating-performance-and-security
+	\bibitem{Olgun24}
+	A. Olgun et al., “ABACuS: all-bank activation counters for scalable and low overhead RowHammer mitigation," in Proceedings of the 33rd USENIX Conference on Security Symposium, in SEC '24. USA: USENIX Association, Aug. 2024, pp. 1579–1596.
+	\bibitem{Bostanci25}
+	F. N. Bostancı et al., “Understanding and Mitigating Covert Channel and Side Channel Vulnerabilities Introduced by RowHammer Defenses," in Proceedings of the 58th IEEE/ACM International Symposium on Microarchitecture, in MICRO '25. New York, NY, USA: Association for Computing Machinery, Oct. 2025, pp. 1412–1432. doi: 10.1145/3725843.3756029.
+	\bibitem{Woo25}
+	J. Woo, J. Qu, G. Saileshwar, and P. J. Nair, “When Mitigations Backfire: Timing Channel Attacks and Defense for PRAC-Based RowHammer Mitigations," in Proceedings of the 52nd Annual International Symposium on Computer Architecture, in ISCA '25. New York, NY, USA: Association for Computing Machinery, Jun. 2025, pp. 739–756. doi: 10.1145/3695053.3731007.
+	\bibitem{Taneja26}
+	H. Taneja, A. Hajiabadi, M. Marazzi, K. Razavi, and M. Qureshi, “MIRZA: Efficiently mitigating RowHammer with randomization and ALERT," in Proceedings of the IEEE International Symposium on High Performance Computer Architecture (HPCA), 2026.
+	\bibitem{Loughlin23}
+	K. Loughlin, J. Rosenblum, S. Saroiu, A. Wolman, D. Skarlatos, and B. Kasikci, “Siloz: Leveraging DRAM Isolation Domains to Prevent Inter-VM Rowhammer," in Proceedings of the 29th Symposium on Operating Systems Principles, in SOSP '23. New York, NY, USA: Association for Computing Machinery, Oct. 2023, pp. 417–433. doi: 10.1145/3600006.3613143.
+	\bibitem{Saxena24_2}
+	A. Saxena, W. Wang, and A. Daglis, “Preventing Rowhammer Exploits via Low-Cost Domain-Aware Memory Allocation," Sep. 23, 2024. Accessed: Mar. 26, 2026. [Online]. Available: https://arxiv.org/abs/2409.15463v1
+	\bibitem{Wi26}
+	Minbok Wi, “Investigating and Improving DRAM-Based Memory System Security by Analyzing and Exploiting DRAM Operations," Ph.D. dissertation, Seoul National University, 2025. Accessed: Mar. 04, 2026. [Online]. Available: \url{https://s-space.snu.ac.kr/handle/10371/228887}
+	\bibitem{M25}
+	P. M, M. Mutyam, and V. K. Tavva, “Selective Subarray Isolation for Mitigating RowHammer Attack," ACM Trans. Embed. Comput. Syst., vol. 24, no. 5s, p. 127:1-127:22, Sep. 2025, doi: 10.1145/3762996.
+	\bibitem{Izzo18}
+	N. Izzo, “Reliably achieving and efficiently preventing Rowhammer attacks," Master Thesis, POLITECNICO DI MILANO, 2017. Accessed: Mar. 26, 2026. [Online]. Available: \url{https://www.politesi.polimi.it/handle/10589/137667}
+	\bibitem{Brasser16}
+	F. Brasser, L. Davi, D. Gens, C. Liebchen, and A.-R. Sadeghi, “CAn't Touch This: Practical and Generic Software-only Defenses Against Rowhammer Attacks," Dec. 07, 2016, arXiv: arXiv:1611.08396. doi: 10.48550/arXiv.1611.08396.
+	\bibitem{Konoth18}
+	R. K. Konoth et al., “ZebRAM: comprehensive and compatible software protection against rowhammer attacks," in Proceedings of the 13th USENIX conference on Operating Systems Design and Implementation, in OSDI'18. USA: USENIX Association, Oct. 2018, pp. 697–710.
+	\bibitem{Yun14}
+	H. Yun, R. Mancuso, Z.-P. Wu, and R. Pellizzoni, “PALLOC: DRAM bank-aware memory allocator for performance isolation on multicore platforms," in 2014 IEEE 19th Real-Time and Embedded Technology and Applications Symposium (RTAS), Berlin, Germany: IEEE, Apr. 2014, pp. 155–166. doi: 10.1109/RTAS.2014.6925999.
+	\bibitem{Tatar18}
+	A. Tatar, R. K. Konoth, E. Athanasopoulos, C. Giuffrida, H. Bos, and K. Razavi, “Throwhammer: Rowhammer Attacks over the Network and Defenses," presented at the 2018 USENIX Annual Technical Conference (USENIX ATC 18), 2018, pp. 213–226. Accessed: Mar. 27, 2026. [Online]. Available: \url{https://www.usenix.org/conference/atc18/presentation/tatar}
+	\bibitem{Bock19}
+	C. Bock, F. Brasser, D. Gens, C. Liebchen, and A.-R. Sadeghi, “RIP-RH: Preventing Rowhammer-based Inter-Process Attacks," in Proceedings of the 2019 ACM Asia Conference on Computer and Communications Security, in Asia CCS '19. New York, NY, USA: Association for Computing Machinery, Jul. 2019, pp. 561–572. doi: 10.1145/3321705.3329827.
+	\bibitem{Saileshwar22}
+	G. Saileshwar, B. Wang, M. Qureshi, and P. J. Nair, “Randomized row-swap: mitigating Row Hammer by breaking spatial correlation between aggressor and victim rows," in Proceedings of the 27th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, in ASPLOS '22. New York, NY, USA: Association for Computing Machinery, Feb. 2022, pp. 1056–1069. doi: 10.1145/3503222.3507716.
+	\bibitem{Saxena22}
+	A. Saxena, G. Saileshwar, P. J. Nair, and M. Qureshi, "AQUA: Scalable Rowhammer Mitigation by Quarantining Aggressor Rows at Runtime," in 2022 55th IEEE/ACM International Symposium on Microarchitecture (MICRO), Chicago, IL, USA: IEEE, Oct. 2022, pp. 108–123. doi: 10.1109/MICRO56248.2022.00022.
+	\bibitem{Heckel26}
+	M.~Heckel, N.~Sayadi, J.~Juffinger, C.~Fiedler, D.~Gruss, and F.~Adamsky, 
+	“FLIPPYRAM: A Large-Scale Study of Rowhammer Prevalence,” 
+	in \textit{Proc. Network and Distributed System Security Symp. (NDSS)}, 
+	Internet Society, 2026. [Online]. Available: \url{https://www.ndss-symposium.org/wp-content/uploads/2026-f1810-paper.pdf}
+	\bibitem{Cojocar20}
+	L. Cojocar et al., “Are We Susceptible to Rowhammer? An End-to-End Methodology for Cloud Providers,” in 2020 IEEE Symposium on Security and Privacy (SP), San Francisco, CA, USA: IEEE, May 2020, pp. 712–728. doi: 10.1109/SP40000.2020.00085.
+	\bibitem{Orosa21}
+	L. Orosa et al., “A Deeper Look into RowHammer’s Sensitivities: Experimental Analysis of Real DRAM Chips and Implications on Future Attacks and Defenses,” in MICRO-54: 54th Annual IEEE/ACM International Symposium on Microarchitecture, in MICRO ’21. New York, NY, USA: Association for Computing Machinery, Oct. 2021, pp. 1182–1197. doi: 10.1145/3466752.3480069.
+	\bibitem{Zhang24}
+	Z. Zhang et al., “SoK: Rowhammer on Commodity Operating Systems,” in Proceedings of the 19th ACM Asia Conference on Computer and Communications Security, in ASIA CCS ’24. New York, NY, USA: Association for Computing Machinery, Jul. 2024, pp. 436–452. doi: 10.1145/3634737.3656998.
+	\bibitem{Kim25}
+	M. J. Kim, S. Baek, J. Kim, H. Nam, N. S. Kim, and J. H. Ahn, “SoK: Systematizing a Decade of Architectural RowHammer Defenses Through the Lens of Streaming Algorithms,” Nov. 09, 2025, arXiv: arXiv:2511.06192. doi: 10.48550/arXiv.2511.06192.
+	\bibitem{MutluKim20}
+	O. Mutlu and J. S. Kim, “RowHammer: A Retrospective,” IEEE Trans. Comput.-Aided Des. Integr. Circuits Syst., vol. 39, no. 8, pp. 1555–1571, Aug. 2020, doi: 10.1109/TCAD.2019.2915318.
+	\bibitem{Mutlu23}
+	O. Mutlu, “Retrospective: Flipping Bits in Memory Without Accessing Them: An Experimental Study of DRAM Disturbance Errors,” Jun. 28, 2023, arXiv: arXiv:2306.16093. doi: 10.48550/arXiv.2306.16093.
+	\bibitem{Mutlu23_2}
+	O. Mutlu, A. Olgun, and A. G. Yağlıkcı, “Fundamentally Understanding and Solving RowHammer,” in Proceedings of the 28th Asia and South Pacific Design Automation Conference, in ASPDAC ’23. New York, NY, USA: Association for Computing Machinery, Jan. 2023, pp. 461–468. doi: 10.1145/3566097.3568350.
+	\bibitem{Irazoqui18}
+	G. Irazoqui, T. Eisenbarth, and B. Sunar, “MASCAT: Preventing Microarchitectural Attacks Before Distribution,” in Proceedings of the Eighth ACM Conference on Data and Application Security and Privacy, in CODASPY ’18. New York, NY, USA: Association for Computing Machinery, Mar. 2018, pp. 377–388. doi: 10.1145/3176258.3176316.
+	\bibitem{Gruss18}
+	D. Gruss et al., “Another Flip in the Wall of Rowhammer Defenses,” in 2018 IEEE Symposium on Security and Privacy (SP), May 2018, pp. 245–261. doi: 10.1109/SP.2018.00031.
+	\bibitem{Zhang20}
+	Z. Zhang, Z. Zhan, D. Balasubramanian, B. Li, P. Volgyesi, and X. Koutsoukos, “Leveraging EM Side-Channel Information to Detect Rowhammer Attacks,” in 2020 IEEE Symposium on Security and Privacy (SP), May 2020, pp. 729–746. doi: 10.1109/SP40000.2020.00060.
+	\bibitem{Bennett2021}
+	T. Bennett, S. Saroiu, A. Wolman, and L. Cojocar, ``Panopticon: A complete in-DRAM Rowhammer mitigation,'' in \textit{Workshop on DRAM Security (DRAMSec)}, vol. 22, 2021, p. 110.
+	\bibitem{Yaglikci21}
+	A. G. Yağlikçi et al., “BlockHammer: Preventing RowHammer at Low Cost by Blacklisting Rapidly-Accessed DRAM Rows,” in 2021 IEEE International Symposium on High-Performance Computer Architecture (HPCA), Feb. 2021, pp. 345–358. doi: 10.1109/HPCA51647.2021.00037.
+	\bibitem{Lee23}
+	S. Lee, K.-D. Kang, G. Park, N. S. Kim, and D. Kim, “NoHammer: Preventing Row Hammer With Last-Level Cache Management,” IEEE Comput. Arch. Lett., vol. 22, no. 2, pp. 157–160, Jul. 2023, doi: 10.1109/LCA.2023.3320670.
+	\bibitem{Qureshi26}
+	M. K. Qureshi, “SALT: Track-and-Mitigate Subarrays, Not Rows, for Blast-Radius-Free Rowhammer Defense,” in 2026 IEEE International Symposium on High Performance Computer Architecture (HPCA), Jan. 2026, pp. 1–16. doi: 10.1109/HPCA68181.2026.11408602.
+	\bibitem{Nazaraliyev25_2}
+	R. Nazaraliyev, Y. Zhang, S. B. Dutta, A. Márquez, K. Barker, and N. B. Abu-Ghazaleh, “Not so Refreshing: Attacking GPUs using RFM Rowhammer Mitigation,” presented at the USENIX Security Symposium, 2025.
+	\bibitem{Luo23}
+	H. Luo et al., “RowPress: Amplifying Read Disturbance in Modern DRAM Chips,” in Proceedings of the 50th Annual International Symposium on Computer Architecture, in ISCA ’23. New York, NY, USA: Association for Computing Machinery, Jun. 2023, pp. 1–18. doi: 10.1145/3579371.3589063.
+	\bibitem{Qureshi25}
+	M. Qureshi and S. Qazi, “MOAT: Securely Mitigating Rowhammer with Per-Row Activation Counters,” in Proceedings of the 30th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 1, in ASPLOS ’25. New York, NY, USA: Association for Computing Machinery, Mar. 2025, pp. 698–714. doi: 10.1145/3669940.3707278.
+	\bibitem{Anderson23}
+	R. Anderson and N. Boucher, “If It’s Provably Secure, It Probably Isn’t: Why Learning from Proof Failure Is Hard,” in Security Protocols XXVIII, F. Stajano, V. Matyáš, B. Christianson, and J. Anderson, Eds., Cham: Springer Nature Switzerland, 2023, pp. 199–204. doi: 10.1007/978-3-031-43033-6\_19.
+	\bibitem{Heckel26_2}
+	M. Heckel, H. Weissteiner, F. Adamsky, and D. Gruss, “Epistemology of Rowhammer Attacks: Threats to Rowhammer Research Validity,” in Computer Security – ESORICS 2025, V. Nicomette, A. Benzekri, N. Boulahia-Cuppens, and J. Vaidya, Eds., Cham: Springer Nature Switzerland, 2026, pp. 204–223. doi: 10.1007/978-3-032-07894-0\_11.
+	\bibitem{Luo24}
+	H. Luo et al., “RowPress Vulnerability in Modern DRAM Chips,” IEEE Micro, vol. 44, no. 4, pp. 60–69, Jul. 2024, doi: 10.1109/MM.2024.3409521.
+	\bibitem{Yaglikci22}
+	A. G. Yağlıkçı et al., “Understanding RowHammer Under Reduced Wordline Voltage: An Experimental Study Using Real DRAM Devices,” in 2022 52nd Annual IEEE/IFIP International Conference on Dependable Systems and Networks (DSN), Jun. 2022, pp. 475–487. doi: 10.1109/DSN53405.2022.00054.
+	\bibitem{Luo24_2}
+	H. Luo, İ. E. Yüksel, A. Olgun, A. G. Yağlıkçı, M. Sadrosadati, and O. Mutlu, “An Experimental Characterization of Combined RowHammer and RowPress Read Disturbance in Modern DRAM Chips,” in 2024 54th Annual IEEE/IFIP International Conference on Dependable Systems and Networks - Supplemental Volume (DSN-S), Jun. 2024, pp. 6–11. doi: 10.1109/DSN-S60304.2024.00013.
+	\bibitem{Qureshi24_2}
+	M. K. Qureshi, A. Saxena, and A. Jaleel, “ImPress: Securing DRAM Against Data-Disturbance Errors via Implicit Row-Press Mitigation,” in \textit{Proc. 57th IEEE/ACM Int. Symp. Microarchitecture (MICRO)}, 2024, pp. 935--948, doi: 10.1109/MICRO61859.2024.00073.
+	\bibitem{Vittal25}
+	S. Vittal, S. Qazi, P. Das, and M. Qureshi, “MoPAC: Efficiently Mitigating Rowhammer with Probabilistic Activation Counting,” in Proceedings of the 52nd Annual International Symposium on Computer Architecture, in ISCA ’25. New York, NY, USA: Association for Computing Machinery, Jun. 2025, pp. 723–738. doi: 10.1145/3695053.3730997.
+	\bibitem{Marazzi23}
+	M. Marazzi, F. Solt, P. Jattke, K. Takashi, and K. Razavi, “REGA: Scalable Rowhammer Mitigation with Refresh-Generating Activations,” in 2023 IEEE Symposium on Security and Privacy (SP), May 2023, pp. 1684–1701. doi: 10.1109/SP46215.2023.10179327.
+\end{thebibliography}
