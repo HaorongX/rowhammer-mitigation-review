@@ -127,7 +127,7 @@ In this section, trackers are first introduced as a universal primitive. They ar
 
 \subsection{Trackers: A Universal Primitive}\label{sec:tracker}
 
-As described above, trackers are data structures used to track potential aggressor rows. They can be modeled as an array: a tracker stores activation counts of a subset of all DRAM rows and their activation counts. Generally, there are two types of trackers, depending on their locations: SRAM trackers and DRAM trackers. 
+As described above, trackers are data structures used to track potential aggressor rows. They can be modeled as an array: a tracker stores activation counts of a set of DRAM rows and their activation counts. Generally, there are two types of trackers, depending on their locations: SRAM trackers and DRAM trackers. 
 
 SRAM (Static Random-Access Memory) trackers are located in on-chip logic space, offering high-speed storage. However, the on-chip logic space is extremely limited, often being only a few bytes\cite{Qureshi24} . Therefore, SRAM trackers can only keep track of a few rows\cite{Hajiabadi25}, necessitating dynamical insertion and replacement of row entries. 
 
