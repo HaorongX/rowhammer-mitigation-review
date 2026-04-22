@@ -62,25 +62,39 @@
             \item Frequency-centric
             \item Isolation-centric
         \end{itemize}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.8\columnwidth]{mitigation.png}
+        \end{figure}
     \end{frame}
     
 	\begin{frame}{Defense Approach 1: Refresh-Centric}
 		\textbf{Refreshing the Victims}
 		\begin{itemize}
-			\item \textbf{How it works:} Before the aggressors can successfully corrupt the data, the system quickly "refreshes" the victim rows to restore their electrical charge
-			\item \textbf{The Trade-off:} Keeping track of which rows need refreshing requires complex tracking arrays.
+			\item \textbf{How it works:} Restore charge before it leaks
+			\item \textbf{The Tradeoff:} Either: Keeping track of which rows need refreshing $\rightarrow$ complex tracking arrays.
+            
+            Or: Probabilistically refresh rows.
 			\item \textbf{The Flaw:} $T_{RH}$ falls $\rightarrow$ more refresh
-			\item Refreshing action itself can be hijacked by the attacker to cause further damage
 		\end{itemize}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.7\columnwidth]{refresh.png}
+        \end{figure}
 	\end{frame}
 	
 	\begin{frame}{Defense Approach 2: Frequency-Centric}
 		\textbf{Stopping the Attacker}
 		\begin{itemize}
 			\item \textbf{How it works:} Set a speed limit.
-			\item \textbf{The Trade-off:} The system has to guess whether a row is being hammered.
-			\item \textbf{The Flaw:} False alarms!
+			\item \textbf{The Flaw:} False alarms cost too much.
+            
+            Lower $T_{RH} \rightarrow$ More false alarms  
 		\end{itemize}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.7\columnwidth]{refresh.png}
+        \end{figure}
 	\end{frame}
 	
 	\begin{frame}{Defense Approach 3: Isolation-Centric}
