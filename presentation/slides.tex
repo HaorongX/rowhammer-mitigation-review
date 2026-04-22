@@ -8,13 +8,14 @@
 \subtitle{Exploring RowHammer in DRAM and the Limits of Current Defenses}
 \author{Haorong Xu}
 \institute{(96661) British International Course Centre}
-\date{The 15th of April, 2026}
+\date{The 23rd of April, 2026}
 
 \begin{document}
 	
 	\frame{\titlepage}
 	
 	\begin{frame}{What is RowHammer?}
+        Dynamic Random-Access Memory: short-term memory of a computer
 		\begin{figure}[h]
 			\centering
 			\includegraphics[width=\columnwidth]{drambanks_colored.png}
@@ -22,91 +23,174 @@
 	\end{frame}
 	
 	\begin{frame}{What is RowHammer?}
-		\begin{itemize}
-			\item Dynamic Random-Access Memory (DRAM) is the short-term memory of a computer, storing data in densely packed rows.
+		\begin{figure}[h]
+            \raggedright
+            \includegraphics[width=0.6\columnwidth]{rowhammer.jpg}
+        \end{figure}
+        \begin{itemize}
 			\item \textbf{The Attack:} Repeatedly accessing a row.
-			\item \textbf{The Result:} Electrical interference, causing data bits in the adjacent "neighbor" rows to flip (e.g., a 0 becomes a 1).
-			\item 
+			\item \textbf{The Result:} Bit-flips.
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}{The Growing Threat: Why Do We Care Now?}
 		\textbf{Shrinking Hardware, Growing Vulnerability}
 		\begin{itemize}
-			\item As technology advances, memory chips are packed with more data in physically smaller spaces[cite: 6, 99].
-			\item Because the rows are closer together, it takes fewer "hammer strikes" to cause a bit-flip[cite: 98].
-			\item In modern devices, the threshold to cause corruption has dropped drastically (down to 10k-20k activations), making the attack much easier to execute[cite: 100, 101].
-			\item Mitigations that worked five years ago are now failing[cite: 31].
+			\item DRAM scaling worsens RowHammer
 		\end{itemize}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=\columnwidth]{vulnerable.png}
+        \end{figure}
 	\end{frame}
+    
+    \begin{frame}{The Growing Threat: Why Do We Care Now?}
+        \textbf{Shrinking Hardware, Growing Vulnerability}
+        \begin{itemize}
+            \item Mitigations that worked five years ago are now failing.
+        \end{itemize}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=\columnwidth]{rowhammer_thres.png}
+        \end{figure}
+    \end{frame}
 	
-	\begin{frame}{My Research Process}
-		\textbf{Mapping the Defense Landscape}
-		\begin{itemize}
-			\item \textbf{Goal:} To survey and classify the latest defenses (especially post-2023) against RowHammer[cite: 7].
-			\item \textbf{Methodology:} 
-			\begin{itemize}
-				\item Reviewed cutting-edge studies across major databases (IEEE, ACM, Google Scholar)[cite: 19, 20].
-				\item Categorized defenses into three distinct approaches: Refresh, Frequency, and Isolation[cite: 7, 135].
-				\item Analyzed how each defense system fails and the trade-offs they force hardware designers to make[cite: 14, 137].
-			\end{itemize}
-		\end{itemize}
-	\end{frame}
-	
+    \begin{frame}{Defenses: Loughlin's Taxonomy}
+        \textbf{Loughlin21}
+        \begin{itemize}
+            \item Refresh-centric
+            \item Frequency-centric
+            \item Isolation-centric
+        \end{itemize}
+    \end{frame}
+    
 	\begin{frame}{Defense Approach 1: Refresh-Centric}
-		\textbf{The Quick Fix: Refreshing the Victims}
+		\textbf{Refreshing the Victims}
 		\begin{itemize}
-			\item \textbf{How it works:} Before the "noisy neighbor" can successfully corrupt the data, the system quickly "refreshes" the victim rows to restore their electrical charge[cite: 97, 162].
-			\item \textbf{The Trade-off:} Keeping track of which rows need refreshing requires complex tracking arrays[cite: 164].
-			\item \textbf{The Flaw:} As attacks get faster, the system has to refresh constantly, causing a massive slowdown for normal computer operations[cite: 324].
-			\item In some cases, the refreshing action itself can be hijacked by the attacker to cause further damage[cite: 328, 329].
+			\item \textbf{How it works:} Before the aggressors can successfully corrupt the data, the system quickly "refreshes" the victim rows to restore their electrical charge
+			\item \textbf{The Trade-off:} Keeping track of which rows need refreshing requires complex tracking arrays.
+			\item \textbf{The Flaw:} $T_{RH}$ falls $\rightarrow$ more refresh
+			\item Refreshing action itself can be hijacked by the attacker to cause further damage
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}{Defense Approach 2: Frequency-Centric}
 		\textbf{Stopping the Attacker}
 		\begin{itemize}
-			\item \textbf{How it works:} Instead of protecting the victim, this method acts as a speed limit. It detects when a row is being accessed suspiciously fast and throttles or blocks the attacker[cite: 215, 216].
-			\item \textbf{The Trade-off:} The system has to accurately guess if the rapid access is an attack or just a normal, heavy-duty program[cite: 244].
-			\item \textbf{The Flaw:} False alarms! Innocent programs can be slowed down significantly, potentially denying normal services to the user[cite: 244].
+			\item \textbf{How it works:} Set a speed limit.
+			\item \textbf{The Trade-off:} The system has to guess whether a row is being hammered.
+			\item \textbf{The Flaw:} False alarms!
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}{Defense Approach 3: Isolation-Centric}
 		\textbf{Building Walls and Moving Houses}
 		\begin{itemize}
-			\item \textbf{How it works:} Breaks the physical closeness of the attacker and victim. It either constantly shuffles data around (remapping) or places empty "guard rows" between them as a buffer[cite: 246, 247].
-			\item \textbf{The Trade-off:} Security comes at the cost of valuable space[cite: 272].
-			\item \textbf{The Flaw:} Dedicating memory rows purely to act as "security guards" means users lose out on overall storage capacity[cite: 272]. It can also create fragmented, underutilized memory areas[cite: 257].
+			\item \textbf{How it works:} Breaks the physical closeness of the attacker and victim. 
+			\item Shuffles data around (remapping) 
+			\item Places empty "guard rows" in between
+			\item \textbf{The Trade-off:} Space
+			\begin{figure}[h]
+				\centering
+				\includegraphics[width=0.7\columnwidth]{isolation_colored.png}
+			\end{figure}
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}{Blindspots: We Weren't Looking at the Whole Picture}
 		\textbf{The Rules Are Changing}
 		\begin{itemize}
-			\item \textbf{RowPress:} A newer attack variant showed that bits can flip just by keeping a memory door \textit{open} for a long time, rather than repeatedly opening and closing it[cite: 311]. This breaks the fundamental assumption of most reactive defenses[cite: 315].
-			\item \textbf{Timing Side-Channels:} Smart attackers can observe how long the defense mechanisms take to activate and use that timing data to steal secrets invisibly[cite: 342, 343].
+			\item \textbf{RowPress:} A newer attack variant showed that bits can flip just by keeping a row \textit{open} for a long time
+			\item Breaks the fundamental assumption
+			\item \textbf{Timing Side-Channels:} Smart attackers can observe how long the defense mechanisms take to activate and use that timing data to steal secrets invisibly
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}{Core Conclusion: The Impossible Trinity}
 		\textbf{You Can't Have It All}
-		\begin{itemize}
-			\item My research concludes that current defenses are trapped in a trilemma[cite: 18].
-			\item The industry currently lacks a single mitigation that achieves all three:
-			\begin{enumerate}
-				\item \textbf{Space-Efficiency:} Not wasting memory space (fails in Isolation approaches)[cite: 12, 337].
-				\item \textbf{Low-Latency:} Operating quickly without system slowdowns (fails in Refresh/Frequency approaches)[cite: 12, 336].
-				\item \textbf{Deterministic-Security:} Mathematically guaranteed protection against all variants[cite: 12].
-			\end{enumerate}
-		\end{itemize}
+			\begin{figure}[h]
+				\centering
+				\includegraphics[width=0.9\columnwidth]{unholytri.png}
+			\end{figure}
 	\end{frame}
 	
 	\begin{frame}{Looking Forward}
 		\begin{itemize}
-			\item Future defenses cannot rely on a single approach; they must be hybrid solutions combining strengths from different methods[cite: 365].
-			\item We must rethink our basic assumptions about memory disturbance, moving from reactive band-aids to proactive, foundational hardware security[cite: 351].
-			\item The industry urgently needs a standardized evaluation framework to honestly compare how effective these mitigations truly are[cite: 353, 356].
+			\item We need hybrid approaches.
+			\item We must rethink our basic assumptions about memory disturbance.
+			\item The industry needs a standardized evaluation framework to honestly compare how effective these mitigations truly are.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{My Research Process}
+		\textbf{Topic Selection}
+		\begin{itemize}
+			\item Heavily-researched topic
+			\item Highly impactful
+			\item \textbf{Goal:} To survey and classify the latest defenses (especially post-2023) against RowHammer.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{My Research Process}
+		\textbf{Source Selection \& Evaluation} 
+		\begin{itemize}
+			\item Reviewed high-impact studies across major databases (IEEE, ACM, Google Scholar)
+			\item Keywords: RowHammer, Mitigation, DRAM, Disturbance Error
+			\item Backward chaining \& Forward chaining
+			\item Criteria: Publisher, Peer-reviewed (mostly), Date, Citation Count
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{My Research Process}
+		\textbf{Time Management} 
+		\begin{itemize}
+			\item Weekly review
+			\item Gantt Chart
+			\begin{figure}[h]
+				\centering
+				\includegraphics[width=0.9\columnwidth]{gantt.png}
+			\end{figure}
+			\item Allow for changes of plan: grace period
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{My Research Process}
+		\textbf{Analysis} 
+		\begin{itemize}
+			\item Started from summarizing sources
+			\item Build on existing works
+			\item Trends \& Common themes
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Parting Thoughts}
+		\textbf{Reflection} 
+		\begin{itemize}
+			\item \textbf{Strengths}:
+			\begin{itemize}
+				\item Clear research question
+				\item Recent literature coverage
+				\item Combination of multiple frameworks
+				\item Breakdown of technical concepts
+				\item Effective visual aids
+				\item Plan has been followed thoroughly
+			\end{itemize}
+			\item \textbf{Weaknesses}:
+			\begin{itemize}
+				\item Lack of quantitative evaluation
+				\item Some works simplified
+				\item Bias in selecting papers
+				\item Didn't systematically collect papers
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Parting Thoughts}
+		\begin{itemize}
+			\item \textbf{Learning Reflection}:
+				\item Reading papers efficiently
+				\item Recognize hidden assumptions
+				\item Thinking in tradeoffs
 		\end{itemize}
 	\end{frame}
 	
