@@ -6,6 +6,7 @@
 \usepackage{booktabs}
 \usepackage{xcolor}
 \usepackage{tikz}
+\usepackage{adjustbox}
 \usetikzlibrary{positioning, shapes.geometric, arrows.meta, calc}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -44,9 +45,9 @@
 \begin{document}
 \title{Analyzing Refresh, Frequency, and Isolation Approaches to RowHammer Mitigations}
 \author{\IEEEauthorblockN{Haorong Xu}\\
-		\textit{British International Course Centre (96661)}\\
+		\textit{Guangzhou SCA School}\\
 		Guangzhou, China \\
-		Xu.Haorong@scagz.com}
+		haorongxu09@gmail.com}
 \maketitle
 
 \begin{abstract}
@@ -68,8 +69,6 @@ Several surveys have synthesized the RowHammer mitigation literature. However, e
 This study leverages and critiques Loughlin's taxonomy and analyzes each group of mitigations in detail. Specifically, this study adopts Jaleel's\cite{Jaleel24} framework to assess trackers used in refresh-centric mitigations, which are data structures responsible for monitoring potential aggressor rows. This framework sees in-DRAM trackers as governed by three policies --- insertion  (determining which rows enter the tracker), eviction (managing entry replacement), and mitigation (deciding rows to preventively mitigate).
 
 The cross-category analysis leads to the conclusion of a trilemma: all current mitigations fail to achieve deterministic-security, space-efficiency, and low latency simultaneously.
-
-In this study, sources were identified through searches of Google Scholar, IEEE Xplore, and ACM Digital Library using the terms \textit{RowHammer}, \textit{DRAM Disturbance Error}, and \textit{Mitigation}. Articles published in 2023 and onward are prioritized. As for prior works, this study refers to Naseredini's comprehensive review of RowHammer and its mitigations as a foundational reference\cite{Naseredini23}.
 
 \section{Background}\label{sec:bg}
 
@@ -107,7 +106,7 @@ Unfortunately, the RowHammer vulnerability is worsening over time. As the storag
 
 RowHammer poses a severe security risk to computer systems, as it disrupts \textit{memory isolation}, where accessing a row alters data stored in nearby rows. For instance, \cite{Seaborn15} illustrated that by inducing bit-flips in \textit{Page Table Entry}, a data structure used by the OS to translate virtual memory address to physical memory address, an attacker can gain read and write permission to an arbitrary location in the memory and escalate privilege. Other works have shown that the RowHammer effect is capable of leaking confidential data, such as Deep Neural Networks (DNNs) weights\cite{Rakin22}, digital signature key\cite{Mus23}, and other processes' memory\cite{Kwong20}. Although no in-the-wild attacks have been reported, a recent survey by Heckel et al.\cite{Heckel26} shows that $12.5\%$ of the tested DRAM are vulnerable to fully automated RowHammer attacks, confirming that RowHammer remains a practical and scalable attack vector. 
 
-Over the last decade, many mitigations have been proposed and defeated. Some sophisticated variants manipulate the \textit{access pattern}, defined as the sequence, frequency, and timing of memory access, to bypass mitigations. For instance, while the original RowHammer attack only hammers one row, subsequent double-sided attacks\cite{Seaborn15} and many-sided attacks\cite{Frigo20} leverage complex spatial patterns to amplify disturbance or overwhelm trackers. This will be discussed more in-depth in Section \ref{sec:insertion}.
+Over the last decade, many mitigations have been proposed and defeated. Some sophisticated variants manipulate the \textit{access pattern}, defined as the sequence, frequency, and timing of memory access, to bypass mitigations. For instance, while the original RowHammer attack only hammers one row, subsequent double-sided attacks\cite{Seaborn15} and many-sided attacks\cite{Frigo20} leverage complex spatial patterns to amplify disturbance or overwhelm trackers. This will be discussed more in-depth in Section \ref{sec:tracker}.
 
 \subsection{Previous Works}\label{sec:prev-work}
 
